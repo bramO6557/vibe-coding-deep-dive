@@ -1,0 +1,8 @@
+Generatieprompt
+Genereer een volledige REST API voor een bibliotheek in Node.js.
+Gebruik CRUD‑routes voor boeken. Voeg mermaid‑diagrammen toe voor datamodel en API‑flow.
+
+Uitlegprompts
+1 Wat doet deze code precies?
+2 Hoe werken de belangrijkste functies?
+3 Waar zitten mogelijke fouten of verbeteringen?

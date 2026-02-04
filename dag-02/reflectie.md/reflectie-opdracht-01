@@ -1,0 +1,10 @@
+Ze maken duidelijk:
+- welke entiteiten bestaan
+- hoe data met elkaar verbonden is
+- welke stappen een systeem doorloopt
+- welke gebruikersacties belangrijk zijn
+Zonder diagrammen is vaak onduidelijk:
+- welke API-endpoints nodig zijn
+- hoe data precies stroomt
+- welke states of uitzonderingen een systeem heeft
+- hoe verschillende rollen met het systeem interacteren

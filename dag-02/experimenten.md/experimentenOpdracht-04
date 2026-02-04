@@ -1,0 +1,9 @@
+Wat deed de agent automatisch?
+- genereerde endpoints die ik niet had gevraagd
+- maakte automatisch voorbeelddata
+- bouwde testbestanden aan de hand van de OpenAPI
+
+Wat moest jij corrigeren of stoppen?
+- agent verzon extra velden
+- testcases klopten niet met de specificatie
+- agent maakte code in plaats van specificatie

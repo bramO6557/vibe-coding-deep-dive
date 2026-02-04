@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHERIA | Cyber Arena (Titans Included)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff0055;
+            --neon-green: #00ff00;
+            --neon-yellow: #ffff00;
+            --bg-dark: #050505;
+            --hud-bg: rgba(0, 0, 0, 0.6);
+        }
+        
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            font-family: 'Rajdhani', sans-serif;
+            color: white;
+            user-select: none;
+        }
+
+        /* HUD Overlay */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .hud-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .health-bar-container {
+            width: 300px;
+            height: 20px;
+            border: 2px solid var(--neon-pink);
+            transform: skewX(-20deg);
+            background: rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: var(--neon-pink);
+            width: 100%;
+            transition: width 0.2s;
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .controls-hint {
+            font-size: 0.9rem;
+            color: #aaa;
+            text-align: right;
+        }
+
+        /* Screens (Start / Game Over) */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            backdrop-filter: blur(5px);
+            pointer-events: auto;
+            transition: opacity 0.5s;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            color: white;
+            text-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-pink);
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        .btn-main {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 2px solid var(--neon-blue);
+            padding: 15px 40px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        .btn-main:hover {
+            background: var(--neon-blue);
+            color: black;
+            box-shadow: 0 0 30px var(--neon-blue);
+        }
+
+        .btn-back {
+            margin-top: 20px;
+            background: transparent;
+            color: #666;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .btn-back:hover {
+            color: white;
+            border-color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- UI Overlay -->
+    <div id="ui-layer">
+        <div class="hud-top">
+            <div id="score">SCORE: 000000</div>
+            <div id="level">SECTOR: 1</div>
+        </div>
+        <div class="hud-bottom">
+            <div>
+                <div style="margin-bottom: 5px; font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon-pink);">HULL INTEGRITY</div>
+                <div class="health-bar-container">
+                    <div class="health-fill" id="healthBar"></div>
+                </div>
+            </div>
+            <div class="controls-hint">
+                [WASD/ARROWS] Move &nbsp;|&nbsp; [SPACE] Shoot
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="startScreen" class="screen">
+        <h1>Aetheria</h1>
+        <h2>Titan Protocol Active</h2>
+        <button class="btn-main" id="startBtn">Initialiseren Missie</button>
+        <br>
+        <a href="index.html" class="btn-back">← Terug naar Nexus</a>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="screen hidden">
+        <h1 style="color: var(--neon-pink); text-shadow: 0 0 20px var(--neon-pink);">Mission Failed</h1>
+        <h2 id="finalScore">Score: 0</h2>
+        <button class="btn-main" id="restartBtn">Opnieuw Starten</button>
+        <br>
+        <a href="index.html" class="btn-back">← Terug naar Nexus</a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // UI Elements
+        const scoreEl = document.getElementById('score');
+        const levelEl = document.getElementById('level');
+        const healthBar = document.getElementById('healthBar');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const finalScoreEl = document.getElementById('finalScore');
+
+        // Resize Handling
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Game State
+        let gameRunning = false;
+        let score = 0;
+        let level = 1;
+        let frames = 0;
+        
+        // Input Handling
+        const keys = { w: false, a: false, s: false, d: false, space: false };
+        
+        window.addEventListener('keydown', e => {
+            if(e.code === 'KeyW' || e.code === 'ArrowUp') keys.w = true;
+            if(e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = true;
+            if(e.code === 'KeyS' || e.code === 'ArrowDown') keys.s = true;
+            if(e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = true;
+            if(e.code === 'Space') {
+                keys.space = true;
+                e.preventDefault(); 
+            }
+        });
+        
+        window.addEventListener('keyup', e => {
+            if(e.code === 'KeyW' || e.code === 'ArrowUp') keys.w = false;
+            if(e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = false;
+            if(e.code === 'KeyS' || e.code === 'ArrowDown') keys.s = false;
+            if(e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = false;
+            if(e.code === 'Space') keys.space = false;
+        });
+
+        // Classes
+        class Player {
+            constructor() {
+                this.x = canvas.width / 2;
+                this.y = canvas.height - 100;
+                this.size = 20;
+                this.speed = 7;
+                this.color = '#00f3ff';
+                this.health = 100;
+                this.maxHealth = 100;
+                this.lastShot = 0;
+            }
+
+            update() {
+                if(keys.w && this.y > this.size) this.y -= this.speed;
+                if(keys.s && this.y < canvas.height - this.size) this.y += this.speed;
+                if(keys.a && this.x > this.size) this.x -= this.speed;
+                if(keys.d && this.x < canvas.width - this.size) this.x += this.speed;
+
+                if(keys.space && Date.now() - this.lastShot > 120) {
+                    bullets.push(new Bullet(this.x, this.y - this.size));
+                    this.lastShot = Date.now();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                
+                // Draw Ship
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size);
+                ctx.lineTo(this.size, this.size);
+                ctx.lineTo(0, this.size * 0.6);
+                ctx.lineTo(-this.size, this.size);
+                ctx.closePath();
+                
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+
+                // Engine flame
+                ctx.beginPath();
+                ctx.moveTo(-this.size * 0.5, this.size);
+                ctx.lineTo(this.size * 0.5, this.size);
+                ctx.lineTo(0, this.size + (Math.random() * 25 + 10));
+                ctx.fillStyle = '#ff0055';
+                ctx.shadowColor = '#ff0055';
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+
+        class Bullet {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.speed = 18; 
+                this.size = 4;
+                this.markedForDeletion = false;
+            }
+            update() {
+                this.y -= this.speed;
+                if(this.y < 0) this.markedForDeletion = true;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.fillStyle = '#ffff00';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ffff00';
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                ctx.fill();
+            }
+        }
+
+        class Enemy {
+            constructor() {
+                // Random spawn position
+                this.x = Math.random() * (canvas.width - 100) + 50;
+                this.y = -100;
+                
+                // Spawn Logic: 
+                // 5% kans op GELE BOSS
+                // 20% kans op GROENE TANK
+                // 75% kans op STANDAARD
+                const rand = Math.random();
+
+                if (rand < 0.05) {
+                    // --- GELE TITAN (BOSS) ---
+                    this.isBoss = true;
+                    this.isTank = false;
+                    this.type = 'boss';
+                    
+                    this.size = 40; // Groot!
+                    this.color = '#ffff00'; // Neon Geel
+                    
+                    // HP: 6 keer zo veel als de Groene Tank
+                    // Groene: (3 + level/2), Gele: (3 + level/2) * 6
+                    const baseHp = 3 + Math.floor(level / 2);
+                    this.maxHp = baseHp * 6;
+                    this.hp = this.maxHp;
+                    
+                    this.speed = Math.random() * 1 + 1 + (level * 0.2); // Traag
+                    this.points = 3000; // Enorme score bonus
+                    
+                } else if (rand < 0.25) {
+                    // --- GROENE TANK ---
+                    this.isBoss = false;
+                    this.isTank = true;
+                    this.type = 'tank';
+
+                    this.size = Math.random() * 10 + 15; // ~20
+                    this.color = '#00ff00'; // Neon Groen
+                    
+                    this.maxHp = 3 + Math.floor(level / 2);
+                    this.hp = this.maxHp;
+                    
+                    this.speed = Math.random() * 2 + 2 + (level * 0.5); // Medium
+                    this.points = 500;
+
+                } else {
+                    // --- STANDAARD (ROZE) ---
+                    this.isBoss = false;
+                    this.isTank = false;
+                    this.type = 'standard';
+
+                    this.size = Math.random() * 10 + 15; // ~20
+                    this.color = '#ff0055'; // Roze/Rood
+                    
+                    this.maxHp = 1;
+                    this.hp = 1;
+                    
+                    // Snelle targets
+                    this.speed = Math.random() * 4 + 3 + (level * 0.8);
+                    this.points = 150;
+                }
+
+                this.markedForDeletion = false;
+                this.angle = 0;
+                this.spinSpeed = Math.random() * 0.2 - 0.1; 
+            }
+
+            update() {
+                this.y += this.speed;
+                this.angle += this.spinSpeed;
+                if(this.y > canvas.height + this.size) this.markedForDeletion = true;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+
+                if (this.isBoss) {
+                    // --- TEKENEN VAN GELE TITAN ---
+                    
+                    // Groot glow effect
+                    ctx.shadowBlur = 30;
+                    ctx.shadowColor = this.color;
+
+                    // De Bal (Grote Cirkel)
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size, 0, Math.PI*2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+
+                    // Interne details (Titan look)
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 0.7, 0, Math.PI*2);
+                    ctx.fillStyle = 'rgba(200, 200, 0, 0.5)';
+                    ctx.fill();
+
+                    // --- HP BALK (Breed voor grote bal) ---
+                    const barWidth = 60; // Breder dan groene tank
+                    const barHeight = 8;  // Dikker
+                    const yOffset = this.size + 20; 
+                    const hpPercent = this.hp / this.maxHp;
+
+                    // Achtergrond balk
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    ctx.fillRect(-barWidth/2, yOffset, barWidth, barHeight);
+
+                    // Gele HP balk
+                    ctx.fillStyle = '#ffff00';
+                    ctx.fillRect(-barWidth/2, yOffset, barWidth * hpPercent, barHeight);
+                    
+                    // Randje
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(-barWidth/2, yOffset, barWidth, barHeight);
+
+                } else if (this.isTank) {
+                    // --- TEKENEN VAN GROENE TANK BAL ---
+                    
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = this.color;
+
+                    // De Bal
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size, 0, Math.PI*2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+
+                    // Interne details
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 0.6, 0, Math.PI*2);
+                    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                    ctx.fill();
+
+                    // --- HP BALK ---
+                    const barWidth = 40;
+                    const barHeight = 6;
+                    const yOffset = this.size + 15; 
+                    const hpPercent = this.hp / this.maxHp;
+
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    ctx.fillRect(-barWidth/2, yOffset, barWidth, barHeight);
+
+                    ctx.fillStyle = '#00ff00';
+                    ctx.fillRect(-barWidth/2, yOffset, barWidth * hpPercent, barHeight);
+                    
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(-barWidth/2, yOffset, barWidth, barHeight);
+
+                } else {
+                    // --- TEKENEN VAN STANDAARD VIJAND (ZESHOEK) ---
+                    ctx.rotate(this.angle);
+                    
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = this.color;
+                    
+                    ctx.beginPath();
+                    const sides = 6;
+                    for(let i=0; i<sides; i++) {
+                        ctx.lineTo(this.size * Math.cos(i * 2 * Math.PI / sides), this.size * Math.sin(i * 2 * Math.PI / sides));
+                    }
+                    ctx.closePath();
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = 'rgba(255, 0, 85, 0.2)';
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color, isSmall = false) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * (isSmall ? 2 : 3) + 1;
+                this.speedX = Math.random() * (isSmall ? 6 : 10) - (isSmall ? 3 : 5); 
+                this.speedY = Math.random() * (isSmall ? 6 : 10) - (isSmall ? 3 : 5);
+                this.color = color;
+                this.life = 1;
+                this.decay = Math.random() * 0.05 + 0.02;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life -= this.decay;
+            }
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5;
+                this.speed = Math.random() * 0.5 + 0.1;
+                this.brightness = Math.random();
+            }
+            update() {
+                this.y += this.speed * 2 + (gameRunning ? 10 : 1); 
+                if(this.y > canvas.height) {
+                    this.y = 0;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.brightness})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                ctx.fill();
+            }
+        }
+
+        // Game Objects
+        let player;
+        let bullets = [];
+        let enemies = [];
+        let particles = [];
+        let stars = [];
+
+        function init() {
+            player = new Player();
+            bullets = [];
+            enemies = [];
+            particles = [];
+            score = 0;
+            level = 1;
+            frames = 0;
+            gameRunning = true;
+            scoreEl.innerText = "SCORE: 000000";
+            levelEl.innerText = "SECTOR: 1";
+            healthBar.style.width = "100%";
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            animate();
+        }
+
+        // Create background stars
+        for(let i=0; i<100; i++) stars.push(new Star());
+
+        function spawnEnemies() {
+            if(frames % Math.max(10, 50 - level * 4) === 0) {
+                enemies.push(new Enemy());
+            }
+        }
+
+        function createExplosion(x, y, color, isSmall = false) {
+            const count = isSmall ? 5 : 15;
+            for(let i=0; i<count; i++) { 
+                particles.push(new Particle(x, y, color, isSmall));
+            }
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            finalScoreEl.innerText = "Final Score: " + score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        function animate() {
+            if(!gameRunning) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Background
+            stars.forEach(star => { star.update(); star.draw(); });
+
+            // Player
+            player.update();
+            player.draw();
+
+            // Bullets
+            bullets.forEach((bullet, bIndex) => {
+                bullet.update();
+                bullet.draw();
+                if(bullet.markedForDeletion) bullets.splice(bIndex, 1);
+            });
+
+            // Enemies
+            enemies.forEach((enemy, eIndex) => {
+                enemy.update();
+                enemy.draw();
+
+                // Collision: Enemy vs Player
+                const distPlayer = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+                if(distPlayer - enemy.size - player.size < 1) {
+                    createExplosion(enemy.x, enemy.y, enemy.color);
+                    enemies.splice(eIndex, 1);
+                    
+                    // Schade berekenen
+                    let damage = 25;
+                    if(enemy.isBoss) damage = 50; // De Gele Titan doet enorm veel schade
+                    
+                    player.health -= damage;
+                    healthBar.style.width = player.health + "%";
+                    
+                    // Screen shake effect
+                    ctx.translate(Math.random()*20 - 10, Math.random()*20 - 10);
+                    setTimeout(() => ctx.setTransform(1,0,0,1,0,0), 50);
+
+                    if(player.health <= 0) gameOver();
+                }
+
+                // Collision: Bullet vs Enemy
+                bullets.forEach((bullet, bIndex) => {
+                    const distBullet = Math.hypot(bullet.x - enemy.x, bullet.y - enemy.y);
+                    if(distBullet - enemy.size - bullet.size < 1) {
+                        
+                        // Verwijder kogel altijd bij raak
+                        bullets.splice(bIndex, 1);
+
+                        // Logica voor Tanks (Groen en Geel) vs Standaard
+                        if(enemy.isTank || enemy.isBoss) {
+                            // HP omhoog
+                            enemy.hp--;
+                            // Kleine vonk om raak te melden
+                            createExplosion(bullet.x, bullet.y, '#ffffff', true); 
+                            
+                            if(enemy.hp <= 0) {
+                                // Vijand is kapot
+                                createExplosion(enemy.x, enemy.y, enemy.color);
+                                enemies.splice(eIndex, 1);
+                                score += enemy.points;
+                            }
+                        } else {
+                            // Standaard vijand: 1 hit = dood
+                            createExplosion(enemy.x, enemy.y, enemy.color);
+                            enemies.splice(eIndex, 1);
+                            score += enemy.points;
+                        }
+                        
+                        // Update Score display
+                        scoreEl.innerText = "SCORE: " + score.toString().padStart(6, '0');
+                        
+                        // Level Up Check
+                        if(score % 1500 === 0) {
+                            level++;
+                            levelEl.innerText = "SECTOR: " + level;
+                            player.health = Math.min(player.health + 10, 100); 
+                            healthBar.style.width = player.health + "%";
+                        }
+                    }
+                });
+
+                if(enemy.markedForDeletion) enemies.splice(eIndex, 1);
+            });
+
+            // Particles
+            particles.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+                if(particle.life <= 0) particles.splice(index, 1);
+            });
+
+            spawnEnemies();
+            frames++;
+            requestAnimationFrame(animate);
+        }
+
+        // Background animation for menu
+        function menuLoop() {
+            if(gameRunning) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => { star.update(); star.draw(); });
+            requestAnimationFrame(menuLoop);
+        }
+        menuLoop();     
+
+        // Event Listeners
+        document.getElementById('startBtn').addEventListener('click', init);
+        document.getElementById('restartBtn').addEventListener('click', init);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+eeerste
+Je bent een senior backend engineer. Schrijf een volledige en consistente API‑specificatie voor mijn REST API.
+
+Projectcontext:
+- Programmeertaal: node.js
+- Framework: Express (bijv. Express, Spring Boot, FastAPI)
+- Domein: Een eenvoudige To‑Do applicatie waarin gebruikers taken kunnen aanmaken, bekijken, updaten en verwijderen.
+
+Eisen:
+- Gebruik OpenAPI 3.1
+- Definieer alle endpoints die logisch zijn binnen dit domein
+- Voeg request bodies, responses, statuscodes en voorbeeld‑payloads toe
+- Gebruik duidelijke schema’s (components/schemas)
+- Zorg dat de specificatie valideerbaar is
+
+Output:
+- Eén complete `openapi.yaml`
+- Geen code, alleen de specificatie
+
+tweede 
+Gebruik de OpenAPI-specificatie die je zojuist hebt geschreven om volledige API‑integratietests te genereren.
+
+Eisen:
+- Test elk endpoint, inclusief edge cases
+- Gebruik het testframework: Jest + Supertest
+- Maak onderscheid tussen:
+  - happy path tests
+  - foutafhandeling
+  - validatie van request bodies
+- Gebruik duidelijke arrange/act/assert structuur
+- Genereer volledige, uitvoerbare testbestanden
+- Maak een logische mapstructuur, bijvoorbeeld:
+  /tests/integration/todos.test.js
+
+Output:
+- Mapstructuur voor tests
+- Complete testbestanden
+
+
+Eventuele bijsturing
+Stop. Je wijkt af van de opdracht. Gebruik uitsluitend de OpenAPI‑specificatie die je eerder hebt gegenereerd. Geen nieuwe endpoints verzinnen. Corrigeer je output en genereer alleen de gevraagde tests.

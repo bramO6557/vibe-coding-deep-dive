@@ -1,0 +1,490 @@
+prompts eerste website 
+-Maak een eenvoudige webpagina met mijn naam 'Jan Jansen' groot bovenaan, daaronder mijn leeftijd '17 jaar', en onderaan mijn woonplaats 'Amsterdam'. Alles gecentreerd op een witte achtergrond. Gebruik alleen HTML en CSS.
+
+dit is aangelevrd 
+-Maak mijn visitekaartje mooier: voeg een bleu achtergrond toe, maak de tekst groen, en houd alles gecentreerd.
+
+dit ook 
+-voeg ook een foto toe en het is een cirkel en de border moet groen zijn en laat het meer lijken op de aangeleverde afbelding
+
+voegd foto toe 
+-voeg nog wat toe maar een knop en als je er op klikt moet er een kerst onder kommen de knop moet zeggen zeg hallo! en zet in de knop ook een hover dat de helle knop groen woord en de border moet groen zijn als je de knop heb geklikt moet er het volgende kommen testaan Hallo! Leuk je te ontmoeten! en maak de border van deze groen
+
+knopjes
+-maak het zo dat als je weer op de knop klikt dat de tekst dan weg gaat
+
+maakt het compleet functoneeren 
+-maak er nog een knop naast dat de achtergrond kleur veranderd het moet een groene border hebben en een groene hover de kleuren de hij verander mag je zelf weten het moeten er wel 3 zijn en de achtergond kleur moet elke keer verandere als ik op de knop klik
+
+nog meer knoppen 
+-maak ook bij al de kopjes een border met keur groen en de hobbys moeten een redius hebben
+
+border 
+-nee moet anderom niet de kopjes maar de dingen van de hobbys
+
+border
+-nee moet anderom niet de kopjes maar de dingen van de hobbys
+border 
+
+
+code eerste website 
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Profielkaart Jan Jansen</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #0a1f4d, #1e73ff);
+      color: #00ff66;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+      transition: background 0.5s ease;
+    }
+
+    .profile-pic {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: 5px solid #00ff66;
+      object-fit: cover;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin: 10px 0;
+    }
+
+    .info {
+      font-size: 24px;
+      color: white;
+      margin: 5px 0;
+    }
+
+    .location {
+      font-size: 20px;
+      color: #b3e5ff;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      margin-top: 30px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #00ff66;
+      padding: 8px 16px;
+    }
+
+    .hobbies, .contact, .socials {
+      margin-top: 10px;
+      font-size: 18px;
+      color: white;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    /* HOBBY ITEMS MET GROENE BORDER */
+    .hobbies span {
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 2px solid #00ff66;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .hobbies span:hover {
+      background-color: #00ff66;
+      color: #0a1f4d;
+      cursor: pointer;
+    }
+
+    /* CONTACT ITEMS MET GROENE BORDER */
+    .contact div {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 2px solid #00ff66;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .contact div:hover {
+      background-color: #00ff66;
+      color: #0a1f4d;
+      cursor: pointer;
+    }
+
+    /* SOCIALE MEDIA KNOPPEN MET GROENE BORDER */
+    .socials button {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 2px solid #00ff66;
+      background: transparent;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .socials button:hover {
+      background-color: #00ff66;
+      color: #0a1f4d;
+    }
+
+    .buttons {
+      margin-top: 30px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      font-size: 18px;
+      background-color: transparent;
+      color: #00ff66;
+      border: 2px solid #00ff66;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #00ff66;
+      color: #0a1f4d;
+    }
+
+    #greeting {
+      margin-top: 20px;
+      font-size: 22px;
+      color: white;
+      border: 2px solid #00ff66;
+      padding: 10px 20px;
+      border-radius: 8px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <img src="janjansen.jpg" alt="Jan Jansen" class="profile-pic">
+  <h1>Jan Jansen</h1>
+  <div class="info">17 jaar</div>
+  <div class="location">📍 Amsterdam, Nederland</div>
+
+  <div class="section-title">HOBBY'S</div>
+  <div class="hobbies">
+    <span>🎨 Tekenen</span>
+    <span>📚 Lezen</span>
+    <span>🎵 Muziek</span>
+    <span>🏃‍♂️ Hardlopen</span>
+    <span>💻 Programmeren</span>
+  </div>
+
+  <div class="section-title">CONTACT</div>
+  <div class="contact">
+    <div>📧 jan@email.com</div>
+    <div>📱 +31 6 12 34 56 78</div>
+  </div>
+
+  <div class="section-title">SOCIALE MEDIA</div>
+  <div class="socials">
+    <button>LinkedIn</button>
+    <button>Instagram</button>
+    <button>GitHub</button>
+  </div>
+
+  <div class="buttons">
+    <button class="btn" onclick="toggleGreeting()">Zeg Hallo! 👋</button>
+    <button class="btn" onclick="changeTheme()">Verander Thema</button>
+  </div>
+
+  <div id="greeting">Hallo! Leuk je te ontmoeten!</div>
+
+  <script>
+    function toggleGreeting() {
+      const box = document.getElementById('greeting');
+      box.style.display = (box.style.display === 'none' || box.style.display === '') 
+        ? 'block' 
+        : 'none';
+    }
+
+    let themeIndex = 0;
+    const themes = [
+      "linear-gradient(to bottom, #0a1f4d, #1e73ff)",
+      "linear-gradient(to bottom, #004d00, #00cc44)",
+      "linear-gradient(to bottom, #660000, #ff3300)"
+    ];
+
+    function changeTheme() {
+      themeIndex = (themeIndex + 1) % themes.length;
+      document.body.style.background = themes[themeIndex];
+    }
+  </script>
+</body>
+</html>
+
+
+website 2
+-maak een gehelle nieuwe code wel op de vorige gebaseerd zelfde kleurren enzo maak het volegend voornaam achternaam bovenaan in het midde en woonplaats en leeftijd allen de naam in het groen daarna en kleine stuk er tussen van zone 40pixels dan stukje over mij in het groen en een horison tallen lijn om de tekst en de titel te zeiden dan een stuk tekst over mij verzin zelf wat en een afbelding er naar dat een cercel is met een border groen en de tekst van over mij moet wit zijn daana een stuk er tussen van zone 40 pixels en dan de titel vaardigheden met weer een verticallen lijn om het te scheiden met de volgende kopjes en voeg bij elke kopje een border toe de kkopjes zijn creativiteit met als teks er onder tekenen, ontwerpen en creatief denken volgende kopje technologie met als tekst er onder beginnende programmeervaardigheden volegende kopje leren met als tekst nieuwsgierig en snel leren volgede kopje teamwork met als tekst samenwerken en communiceren zet al deze naast elkaar en voeg een groene border toe bij elke kopje dan weer een ruimte er tussen met zone 40pixels met de volgende tittel projecten zet dit in het groen en weer een horisontalen groene lijn er tussen om te tillen van de kopjes te scheiden kopjes zijn  digitaal visitekaartje in het groen tekst verzin het er zelf bij in het wit en er onder moet een knop staan met een borden en de knop moet compleet groen zijn en een border om de gehelle kopje volgend kopje tittel potfolio website goed en weer tekst verzin zelf en weer een knop er onder met de tekst je bent hier! comleet in het groen en een border om het helle kokpje heen volgende kopje tittel toekomstege projecen weer groen en zelf tekst verzinnen met weer een knop met tekst binnenkort... en compleet in het groen de knop en de helle kopje moet weer met een border
+
+maakt het geheele ding 
+-doe meer ruime tussen allen en doe bij vaardigheiden ook nog een toepaselijke emojis
+
+meer ruimte en  emojis
+-maak de emoijs bij de vaardihede groter en zet het boven aan in de border
+
+ja kijk even zelf 
+
+dit was het 
+
+
+code tweede website 
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Profielpagina</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to bottom, #0a1f4d, #1e73ff);
+        color: white;
+        text-align: center;
+    }
+
+    h1 {
+        color: #00ff66;
+        font-size: 48px;
+        margin-top: 60px;
+    }
+
+    .subinfo {
+        font-size: 22px;
+        color: #b3e5ff;
+        margin-bottom: 50px;
+    }
+
+    .spacer {
+        height: 60px;
+    }
+
+    /* TITELS */
+    .section-title {
+        color: #00ff66;
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    /* HORIZONTALE GROENE LIJN */
+    .green-line {
+        width: 80%;
+        height: 3px;
+        background-color: #00ff66;
+        margin: 15px auto 30px auto;
+    }
+
+    /* OVER MIJ */
+    .about-container {
+        width: 70%;
+        margin: auto;
+        margin-bottom: 50px;
+    }
+
+    .about-text {
+        font-size: 20px;
+        color: white;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+
+    .about-img {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        border: 5px solid #00ff66;
+        object-fit: cover;
+        margin-top: 10px;
+    }
+
+    /* VAARDIGHEDEN */
+    .skills-container {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        width: 90%;
+        margin: auto;
+        margin-bottom: 60px;
+    }
+
+    .skill-box {
+        border: 2px solid #00ff66;
+        padding: 25px;
+        width: 220px;
+        border-radius: 12px;
+        position: relative;
+    }
+
+    /* GROTE EMOJI BOVENAAN */
+    .skill-emoji {
+        font-size: 40px;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .skill-title {
+        color: #00ff66;
+        font-size: 22px;
+        margin-bottom: 12px;
+    }
+
+    .skill-text {
+        font-size: 18px;
+        color: white;
+        line-height: 1.5;
+    }
+
+    /* PROJECTEN */
+    .projects-container {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        width: 90%;
+        margin: auto;
+        margin-bottom: 80px;
+    }
+
+    .project-box {
+        border: 2px solid #00ff66;
+        padding: 25px;
+        width: 280px;
+        border-radius: 12px;
+    }
+
+    .project-title {
+        color: #00ff66;
+        font-size: 22px;
+        margin-bottom: 12px;
+    }
+
+    .project-text {
+        font-size: 18px;
+        color: white;
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+
+    .project-btn {
+        background-color: #00ff66;
+        color: #0a1f4d;
+        border: 2px solid #00ff66;
+        padding: 12px 22px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .project-btn:hover {
+        background-color: white;
+        color: #00ff66;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- NAAM -->
+<h1>Jan Jansen</h1>
+<div class="subinfo">17 jaar • Amsterdam</div>
+
+<div class="spacer"></div>
+
+<!-- OVER MIJ -->
+<div class="section-title">Over mij</div>
+<div class="green-line"></div>
+
+<div class="about-container">
+    <div class="about-text">
+        Ik ben een enthousiaste en leergierige student die graag nieuwe dingen ontdekt. 
+        Ik hou van creatief bezig zijn, nieuwe technologieën verkennen en mezelf steeds verbeteren.
+    </div>
+
+    <img src="janjansen.jpg" class="about-img" alt="Profielfoto">
+</div>
+
+<div class="spacer"></div>
+
+<!-- VAARDIGHEDEN -->
+<div class="section-title">Vaardigheden</div>
+
+<div class="skills-container">
+
+    <div class="skill-box">
+        <span class="skill-emoji">🎨</span>
+        <div class="skill-title">Creativiteit</div>
+        <div class="skill-text">Tekenen<br>Ontwerpen<br>Creatief denken</div>
+    </div>
+
+    <div class="skill-box">
+        <span class="skill-emoji">💻</span>
+        <div class="skill-title">Technologie</div>
+        <div class="skill-text">Beginnende programmeervaardigheden</div>
+    </div>
+
+    <div class="skill-box">
+        <span class="skill-emoji">📘</span>
+        <div class="skill-title">Leren</div>
+        <div class="skill-text">Nieuwsgierig<br>Snel leren</div>
+    </div>
+
+    <div class="skill-box">
+        <span class="skill-emoji">🤝</span>
+        <div class="skill-title">Teamwork</div>
+        <div class="skill-text">Samenwerken<br>Communiceren</div>
+    </div>
+
+</div>
+
+<div class="spacer"></div>
+
+<!-- PROJECTEN -->
+<div class="section-title">Projecten</div>
+<div class="green-line"></div>
+
+<div class="projects-container">
+
+    <div class="project-box">
+        <div class="project-title">Digitaal Visitekaartje</div>
+        <div class="project-text">
+            Een modern digitaal kaartje waarin ik mijn creativiteit en webskills combineer.
+        </div>
+        <button class="project-btn">Bekijk project</button>
+    </div>
+
+    <div class="project-box">
+        <div class="project-title">Portfolio Website</div>
+        <div class="project-text">
+            Mijn persoonlijke website waar al mijn werk overzichtelijk wordt gepresenteerd.
+        </div>
+        <button class="project-btn">Je bent hier!</button>
+    </div>
+
+    <div class="project-box">
+        <div class="project-title">Toekomstige Projecten</div>
+        <div class="project-text">
+            Nieuwe ideeën en concepten waar ik binnenkort aan wil beginnen.
+        </div>
+        <button class="project-btn">Binnenkort...</button>
+    </div>
+
+</div>
+
+</body>
+</html>

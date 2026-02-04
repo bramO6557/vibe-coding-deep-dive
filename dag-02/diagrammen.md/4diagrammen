@@ -1,0 +1,60 @@
+Diagram 1 — ERD voor een bibliotheek
+erDiagram
+    BOOK {
+        int id
+        string title
+        string author
+        string isbn
+        int publicationYear
+    }
+
+    USER {
+        int id
+        string name
+        string email
+        string membershipNumber
+    }
+
+    LOAN {
+        int id
+        date loanDate
+        date returnDate
+    }
+
+    BOOK ||--o{ LOAN : "is loaned in"
+    USER ||--o{ LOAN : "borrows"
+
+    Diagram 2 — Sequence diagram voor REST API
+    sequenceDiagram
+    participant App as Bibliotheek App
+    participant API as REST API
+    participant DB as Database
+
+    App->>API: GET /books
+    API->>DB: Query all books
+    DB-->>API: Return book list
+    API-->>App: JSON list of books
+
+    App->>API: POST /loans
+    API->>DB: Insert new loan
+    DB-->>API: Loan created
+    API-->>App: 201 Created
+
+    Diagram 3 — Use-case diagram voor bibliotheekgebruikers
+    graph TD
+    User((Gebruiker))
+    Librarian((Bibliothecaris))
+
+    User --> |Zoekt boeken| SearchBooks
+    User --> |Leent boek| BorrowBook
+    User --> |Retourneert boek| ReturnBook
+
+    Librarian --> |Voegt boek toe| AddBook
+    Librarian --> |Beheert leden| ManageUsers
+
+    Diagram 4 — Extra diagram: State machine voor een boek
+    stateDiagram-v2
+    [*] --> Available
+    Available --> Loaned : user borrows
+    Loaned --> Returned : user returns
+    Returned --> Available
