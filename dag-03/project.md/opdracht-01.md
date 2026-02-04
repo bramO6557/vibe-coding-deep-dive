@@ -1,5 +1,5 @@
 - projectnaam
-Nexus 2099  
+Nexus 2099
 - korte beschrijving (wat is het?)
 De website bevat een homepagina, informatie over het team, een projectenoverzicht en een contactpagina. Daarnaast zit er een simpele game in met punten verdienen, een leaderboard en een shop waar spelers items en achtergronden kunnen kopen.
 - doelgroep

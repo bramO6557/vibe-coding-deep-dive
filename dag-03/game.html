@@ -77,7 +77,7 @@
             text-align: right;
         }
 
-        /* Screens (Start / Game Over) */
+        /* Screens (Start / Game Over / Leaderboard) */
         .screen {
             position: absolute;
             top: 0;
@@ -98,6 +98,7 @@
         .hidden {
             opacity: 0;
             pointer-events: none;
+            display: none !important;
         }
 
         h1 {
@@ -107,6 +108,7 @@
             text-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
             margin-bottom: 10px;
             text-transform: uppercase;
+            letter-spacing: 5px;
         }
 
         h2 {
@@ -128,12 +130,32 @@
             letter-spacing: 2px;
             transition: 0.3s;
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+            margin: 10px;
         }
 
         .btn-main:hover {
             background: var(--neon-blue);
             color: black;
             box-shadow: 0 0 30px var(--neon-blue);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--neon-green);
+            border: 2px solid var(--neon-green);
+            padding: 10px 30px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+            margin: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--neon-green);
+            color: black;
+            box-shadow: 0 0 20px var(--neon-green);
         }
 
         .btn-back {
@@ -151,6 +173,97 @@
         .btn-back:hover {
             color: white;
             border-color: white;
+        }
+
+        /* --- Leaderboard Styles (FIXED FOR SCROLLING) --- */
+        .leaderboard-container {
+            background: rgba(10, 10, 20, 0.9);
+            border: 2px solid var(--neon-blue);
+            padding: 20px; /* Verkleinde padding */
+            min-width: 400px;
+            max-width: 90vw; /* Responsief */
+            max-height: 60vh; /* Max hoogte van container */
+            overflow-y: auto; /* Scrollbalk inschakelen */
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Stijl voor de scrollbar in Cyberpunk look */
+        .leaderboard-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .leaderboard-container::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.5);
+        }
+        .leaderboard-container::-webkit-scrollbar-thumb {
+            background: var(--neon-blue);
+            border-radius: 4px;
+        }
+        .leaderboard-container::-webkit-scrollbar-thumb:hover {
+            background: white;
+        }
+        
+        .leaderboard-container::before {
+            content: ''; position: absolute; top: -5px; left: -5px; width: 20px; height: 20px; border-top: 4px solid white; border-left: 4px solid white; pointer-events: none;
+        }
+        .leaderboard-container::after {
+            content: ''; position: absolute; bottom: -5px; right: -5px; width: 20px; height: 20px; border-bottom: 4px solid white; border-right: 4px solid white; pointer-events: none;
+        }
+
+        .score-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.5rem;
+            margin-top: 10px;
+        }
+
+        .score-table th {
+            text-align: left;
+            color: #888;
+            padding: 10px;
+            border-bottom: 1px solid #444;
+            font-size: 1rem;
+            font-family: 'Orbitron', sans-serif;
+            position: sticky; /* Header bovenaan houden bij scrollen */
+            top: 0;
+            background: rgba(10, 10, 20, 0.95);
+            z-index: 1;
+        }
+
+        .score-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .score-rank { color: var(--neon-yellow); width: 50px; text-align: center; }
+        .score-name { color: white; }
+        .score-val { color: var(--neon-green); text-align: right; font-weight: bold; }
+
+        /* High Score Input */
+        #highScoreInputContainer {
+            text-align: center;
+            display: none;
+        }
+
+        .name-input {
+            background: transparent;
+            border: 2px solid var(--neon-yellow);
+            color: var(--neon-yellow);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            padding: 10px;
+            text-align: center;
+            width: 250px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            outline: none;
+        }
+
+        .name-input::placeholder {
+            color: rgba(255, 255, 0, 0.3);
         }
     </style>
 </head>
@@ -183,17 +296,52 @@
         <h1>Aetheria</h1>
         <h2>Titan Protocol Active</h2>
         <button class="btn-main" id="startBtn">Initialiseren Missie</button>
+        <button class="btn-secondary" id="viewLeaderboardBtn">Ranglijst</button>
         <br>
         <a href="index.html" class="btn-back">← Terug naar Nexus</a>
     </div>
 
     <!-- Game Over Screen -->
     <div id="gameOverScreen" class="screen hidden">
-        <h1 style="color: var(--neon-pink); text-shadow: 0 0 20px var(--neon-pink);">Mission Failed</h1>
-        <h2 id="finalScore">Score: 0</h2>
-        <button class="btn-main" id="restartBtn">Opnieuw Starten</button>
+        <!-- Standard Game Over Content -->
+        <div id="standardGameOverContent" style="text-align: center;">
+            <h1 style="color: var(--neon-pink); text-shadow: 0 0 20px var(--neon-pink);">Mission Failed</h1>
+            <h2 id="finalScore">Score: 0</h2>
+            <button class="btn-main" id="restartBtn">Opnieuw Starten</button>
+        </div>
+
+        <!-- High Score Input Content -->
+        <div id="highScoreInputContainer">
+            <h1 style="color: var(--neon-yellow); text-shadow: 0 0 20px var(--neon-yellow);">NIEUW RECORD!</h1>
+            <h2 id="highScoreDisplay">Score: 0</h2>
+            <input type="text" id="playerNameInput" class="name-input" placeholder="NAAM" maxlength="12">
+            <br>
+            <button class="btn-main" id="saveScoreBtn">OPSLAAN</button>
+        </div>
+
         <br>
         <a href="index.html" class="btn-back">← Terug naar Nexus</a>
+    </div>
+
+    <!-- Leaderboard Screen -->
+    <div id="leaderboardScreen" class="screen hidden">
+        <h1 style="font-size: 2.5rem; margin-bottom: 10px;">RANGLIJST (TOP 20)</h1>
+        <div class="leaderboard-container">
+            <table class="score-table">
+                <thead>
+                    <tr>
+                        <th class="score-rank">#</th>
+                        <th class="score-name">PILOOT</th>
+                        <th class="score-val">SCORE</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <!-- Scores inserted via JS -->
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <button class="btn-secondary" id="backToMenuBtn">TERUG</button>
     </div>
 
     <script>
@@ -207,6 +355,14 @@
         const startScreen = document.getElementById('startScreen');
         const gameOverScreen = document.getElementById('gameOverScreen');
         const finalScoreEl = document.getElementById('finalScore');
+        const leaderboardScreen = document.getElementById('leaderboardScreen');
+        const leaderboardBody = document.getElementById('leaderboardBody');
+
+        // High Score Elements
+        const standardGameOverContent = document.getElementById('standardGameOverContent');
+        const highScoreInputContainer = document.getElementById('highScoreInputContainer');
+        const highScoreDisplay = document.getElementById('highScoreDisplay');
+        const playerNameInput = document.getElementById('playerNameInput');
 
         // Resize Handling
         function resize() {
@@ -244,7 +400,51 @@
             if(e.code === 'Space') keys.space = false;
         });
 
-        // Classes
+        // --- LEADERBOARD LOGIC ---
+        const STORAGE_KEY = 'aetheria_highscores';
+        let highScores = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+        function updateLeaderboardUI() {
+            leaderboardBody.innerHTML = '';
+            highScores.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="score-rank">${index + 1}</td>
+                    <td class="score-name">${entry.name}</td>
+                    <td class="score-val">${entry.score}</td>
+                `;
+                leaderboardBody.appendChild(row);
+            });
+        }
+
+        function checkHighScore(currentScore) {
+            // We staan nu Top 20 toe in plaats van Top 5
+            if (highScores.length < 20) {
+                return true;
+            }
+            const lowestScore = highScores[highScores.length - 1].score;
+            return currentScore > lowestScore;
+        }
+
+        function saveHighScore(name, currentScore) {
+            const newEntry = { name: name.toUpperCase(), score: currentScore };
+            
+            // Voeg nieuwe score toe
+            highScores.push(newEntry);
+            
+            // Sorteer van hoog naar laag
+            highScores.sort((a, b) => b.score - a.score);
+            
+            // FIX: Houd top 20 vast (in plaats van 5)
+            if (highScores.length > 20) {
+                highScores = highScores.slice(0, 20);
+            }
+            
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(highScores));
+            updateLeaderboardUI();
+        }
+
+        // --- GAME CLASSES ---
         class Player {
             constructor() {
                 this.x = canvas.width / 2;
@@ -323,14 +523,8 @@
 
         class Enemy {
             constructor() {
-                // Random spawn position
                 this.x = Math.random() * (canvas.width - 100) + 50;
                 this.y = -100;
-                
-                // Spawn Logic: 
-                // 5% kans op GELE BOSS
-                // 20% kans op GROENE TANK
-                // 75% kans op STANDAARD
                 const rand = Math.random();
 
                 if (rand < 0.05) {
@@ -338,51 +532,36 @@
                     this.isBoss = true;
                     this.isTank = false;
                     this.type = 'boss';
-                    
-                    this.size = 40; // Groot!
-                    this.color = '#ffff00'; // Neon Geel
-                    
-                    // HP: 6 keer zo veel als de Groene Tank
-                    // Groene: (3 + level/2), Gele: (3 + level/2) * 6
+                    this.size = 40; 
+                    this.color = '#ffff00'; 
                     const baseHp = 3 + Math.floor(level / 2);
                     this.maxHp = baseHp * 6;
                     this.hp = this.maxHp;
-                    
-                    this.speed = Math.random() * 1 + 1 + (level * 0.2); // Traag
-                    this.points = 3000; // Enorme score bonus
-                    
+                    this.speed = Math.random() * 1 + 1 + (level * 0.2); 
+                    this.points = 3000; 
                 } else if (rand < 0.25) {
                     // --- GROENE TANK ---
                     this.isBoss = false;
                     this.isTank = true;
                     this.type = 'tank';
-
-                    this.size = Math.random() * 10 + 15; // ~20
-                    this.color = '#00ff00'; // Neon Groen
-                    
+                    this.size = Math.random() * 10 + 15; 
+                    this.color = '#00ff00'; 
                     this.maxHp = 3 + Math.floor(level / 2);
                     this.hp = this.maxHp;
-                    
-                    this.speed = Math.random() * 2 + 2 + (level * 0.5); // Medium
+                    this.speed = Math.random() * 2 + 2 + (level * 0.5); 
                     this.points = 500;
-
                 } else {
                     // --- STANDAARD (ROZE) ---
                     this.isBoss = false;
                     this.isTank = false;
                     this.type = 'standard';
-
-                    this.size = Math.random() * 10 + 15; // ~20
-                    this.color = '#ff0055'; // Roze/Rood
-                    
+                    this.size = Math.random() * 10 + 15; 
+                    this.color = '#ff0055'; 
                     this.maxHp = 1;
                     this.hp = 1;
-                    
-                    // Snelle targets
                     this.speed = Math.random() * 4 + 3 + (level * 0.8);
                     this.points = 150;
                 }
-
                 this.markedForDeletion = false;
                 this.angle = 0;
                 this.spinSpeed = Math.random() * 0.2 - 0.1; 
@@ -399,84 +578,61 @@
                 ctx.translate(this.x, this.y);
 
                 if (this.isBoss) {
-                    // --- TEKENEN VAN GELE TITAN ---
-                    
-                    // Groot glow effect
+                    // GELE TITAN
                     ctx.shadowBlur = 30;
                     ctx.shadowColor = this.color;
-
-                    // De Bal (Grote Cirkel)
                     ctx.beginPath();
                     ctx.arc(0, 0, this.size, 0, Math.PI*2);
                     ctx.fillStyle = this.color;
                     ctx.fill();
 
-                    // Interne details (Titan look)
                     ctx.beginPath();
                     ctx.arc(0, 0, this.size * 0.7, 0, Math.PI*2);
                     ctx.fillStyle = 'rgba(200, 200, 0, 0.5)';
                     ctx.fill();
 
-                    // --- HP BALK (Breed voor grote bal) ---
-                    const barWidth = 60; // Breder dan groene tank
-                    const barHeight = 8;  // Dikker
+                    const barWidth = 60; 
+                    const barHeight = 8;  
                     const yOffset = this.size + 20; 
                     const hpPercent = this.hp / this.maxHp;
-
-                    // Achtergrond balk
                     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
                     ctx.fillRect(-barWidth/2, yOffset, barWidth, barHeight);
-
-                    // Gele HP balk
                     ctx.fillStyle = '#ffff00';
                     ctx.fillRect(-barWidth/2, yOffset, barWidth * hpPercent, barHeight);
-                    
-                    // Randje
                     ctx.strokeStyle = '#fff';
                     ctx.lineWidth = 1;
                     ctx.strokeRect(-barWidth/2, yOffset, barWidth, barHeight);
 
                 } else if (this.isTank) {
-                    // --- TEKENEN VAN GROENE TANK BAL ---
-                    
+                    // GROENE TANK
                     ctx.shadowBlur = 20;
                     ctx.shadowColor = this.color;
-
-                    // De Bal
                     ctx.beginPath();
                     ctx.arc(0, 0, this.size, 0, Math.PI*2);
                     ctx.fillStyle = this.color;
                     ctx.fill();
-
-                    // Interne details
                     ctx.beginPath();
                     ctx.arc(0, 0, this.size * 0.6, 0, Math.PI*2);
                     ctx.fillStyle = 'rgba(0,0,0,0.5)';
                     ctx.fill();
 
-                    // --- HP BALK ---
                     const barWidth = 40;
                     const barHeight = 6;
                     const yOffset = this.size + 15; 
                     const hpPercent = this.hp / this.maxHp;
-
                     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
                     ctx.fillRect(-barWidth/2, yOffset, barWidth, barHeight);
-
                     ctx.fillStyle = '#00ff00';
                     ctx.fillRect(-barWidth/2, yOffset, barWidth * hpPercent, barHeight);
-                    
                     ctx.strokeStyle = '#fff';
                     ctx.lineWidth = 1;
                     ctx.strokeRect(-barWidth/2, yOffset, barWidth, barHeight);
 
                 } else {
-                    // --- TEKENEN VAN STANDAARD VIJAND (ZESHOEK) ---
+                    // STANDAARD (ZESHOEK)
                     ctx.rotate(this.angle);
-                    
                     ctx.shadowBlur = 10;
                     ctx.shadowColor = this.color;
-                    
                     ctx.beginPath();
                     const sides = 6;
                     for(let i=0; i<sides; i++) {
@@ -486,7 +642,6 @@
                     ctx.strokeStyle = this.color;
                     ctx.lineWidth = 2;
                     ctx.stroke();
-                    
                     ctx.fillStyle = 'rgba(255, 0, 85, 0.2)';
                     ctx.fill();
                 }
@@ -563,8 +718,14 @@
             scoreEl.innerText = "SCORE: 000000";
             levelEl.innerText = "SECTOR: 1";
             healthBar.style.width = "100%";
+            
+            // UI Reset
             startScreen.classList.add('hidden');
             gameOverScreen.classList.add('hidden');
+            standardGameOverContent.style.display = 'block';
+            highScoreInputContainer.style.display = 'none';
+            playerNameInput.value = '';
+            
             animate();
         }
 
@@ -586,8 +747,20 @@
 
         function gameOver() {
             gameRunning = false;
-            finalScoreEl.innerText = "Final Score: " + score;
             gameOverScreen.classList.remove('hidden');
+
+            if (checkHighScore(score)) {
+                // Show High Score Input
+                standardGameOverContent.style.display = 'none';
+                highScoreInputContainer.style.display = 'block';
+                highScoreDisplay.innerText = "Score: " + score;
+                setTimeout(() => playerNameInput.focus(), 100);
+            } else {
+                // Show Standard Game Over
+                standardGameOverContent.style.display = 'block';
+                highScoreInputContainer.style.display = 'none';
+                finalScoreEl.innerText = "Score: " + score;
+            }
         }
 
         function animate() {
@@ -620,14 +793,13 @@
                     createExplosion(enemy.x, enemy.y, enemy.color);
                     enemies.splice(eIndex, 1);
                     
-                    // Schade berekenen
                     let damage = 25;
-                    if(enemy.isBoss) damage = 50; // De Gele Titan doet enorm veel schade
+                    if(enemy.isBoss) damage = 50; 
                     
                     player.health -= damage;
                     healthBar.style.width = player.health + "%";
                     
-                    // Screen shake effect
+                    // Screen shake
                     ctx.translate(Math.random()*20 - 10, Math.random()*20 - 10);
                     setTimeout(() => ctx.setTransform(1,0,0,1,0,0), 50);
 
@@ -638,31 +810,23 @@
                 bullets.forEach((bullet, bIndex) => {
                     const distBullet = Math.hypot(bullet.x - enemy.x, bullet.y - enemy.y);
                     if(distBullet - enemy.size - bullet.size < 1) {
-                        
-                        // Verwijder kogel altijd bij raak
                         bullets.splice(bIndex, 1);
 
-                        // Logica voor Tanks (Groen en Geel) vs Standaard
                         if(enemy.isTank || enemy.isBoss) {
-                            // HP omhoog
                             enemy.hp--;
-                            // Kleine vonk om raak te melden
                             createExplosion(bullet.x, bullet.y, '#ffffff', true); 
                             
                             if(enemy.hp <= 0) {
-                                // Vijand is kapot
                                 createExplosion(enemy.x, enemy.y, enemy.color);
                                 enemies.splice(eIndex, 1);
                                 score += enemy.points;
                             }
                         } else {
-                            // Standaard vijand: 1 hit = dood
                             createExplosion(enemy.x, enemy.y, enemy.color);
                             enemies.splice(eIndex, 1);
                             score += enemy.points;
                         }
                         
-                        // Update Score display
                         scoreEl.innerText = "SCORE: " + score.toString().padStart(6, '0');
                         
                         // Level Up Check
@@ -699,9 +863,43 @@
         }
         menuLoop();     
 
-        // Event Listeners
+        // --- EVENT LISTENERS ---
+
+        // Start Game
         document.getElementById('startBtn').addEventListener('click', init);
         document.getElementById('restartBtn').addEventListener('click', init);
+
+        // Leaderboard UI
+        document.getElementById('viewLeaderboardBtn').addEventListener('click', () => {
+            startScreen.classList.add('hidden');
+            leaderboardScreen.classList.remove('hidden');
+            updateLeaderboardUI();
+        });
+
+        document.getElementById('backToMenuBtn').addEventListener('click', () => {
+            leaderboardScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        });
+
+        // High Score Saving
+        document.getElementById('saveScoreBtn').addEventListener('click', () => {
+            const name = playerNameInput.value.trim() || "UNKNOWN";
+            saveHighScore(name, score);
+            
+            // Na opslaan, ga naar de ranglijst
+            highScoreInputContainer.style.display = 'none';
+            standardGameOverContent.style.display = 'block';
+            gameOverScreen.classList.add('hidden');
+            leaderboardScreen.classList.remove('hidden');
+            updateLeaderboardUI();
+        });
+
+        // Enter key om naam op te slaan
+        playerNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('saveScoreBtn').click();
+            }
+        });
 
     </script>
 </body>
