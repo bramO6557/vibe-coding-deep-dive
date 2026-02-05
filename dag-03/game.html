@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AETHERIA | Cyber Arena (Titans Included)</title>
+    <title>AETHERIA | Cyber Arena (Casino Update V2)</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,8 +11,11 @@
             --neon-pink: #ff0055;
             --neon-green: #00ff00;
             --neon-yellow: #ffff00;
+            --neon-gold: #ffd700;
             --bg-dark: #050505;
             --hud-bg: rgba(0, 0, 0, 0.6);
+            --card-bg: #111;
+            --card-border: #444;
         }
         
         body {
@@ -46,6 +49,21 @@
             font-family: 'Orbitron', sans-serif;
             font-size: 1.5rem;
             text-shadow: 0 0 10px var(--neon-blue);
+            align-items: center;
+            gap: 20px;
+        }
+
+        #level { color: var(--neon-green); min-width: 100px; }
+
+        .coin-display {
+            color: var(--neon-gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 15px;
+            border: 1px solid var(--neon-gold);
+            border-radius: 5px;
         }
 
         .hud-bottom {
@@ -71,20 +89,16 @@
             box-shadow: 0 0 10px var(--neon-pink);
         }
 
-        .controls-hint {
-            font-size: 0.9rem;
-            color: #aaa;
-            text-align: right;
-        }
+        .controls-hint { font-size: 0.9rem; color: #aaa; text-align: right; }
 
-        /* Screens (Start / Game Over / Leaderboard) */
+        /* Screens */
         .screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.9);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -95,11 +109,7 @@
             transition: opacity 0.5s;
         }
 
-        .hidden {
-            opacity: 0;
-            pointer-events: none;
-            display: none !important;
-        }
+        .hidden { opacity: 0; pointer-events: none; display: none !important; }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
@@ -111,13 +121,31 @@
             letter-spacing: 5px;
         }
 
-        h2 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--neon-pink);
+        h2 { font-family: 'Orbitron', sans-serif; color: var(--neon-pink); text-transform: uppercase; margin-bottom: 30px; }
+
+        /* Difficulty Buttons */
+        .difficulty-container { display: flex; gap: 15px; margin-bottom: 30px; }
+        .diff-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #444;
+            color: #888;
+            padding: 10px 20px;
+            font-family: 'Rajdhani';
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
             text-transform: uppercase;
-            margin-bottom: 30px;
+            transition: 0.3s;
+        }
+        .diff-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .diff-btn.active {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            background: rgba(0, 243, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
         }
 
+        /* Main Buttons */
         .btn-main {
             background: transparent;
             color: var(--neon-blue);
@@ -132,12 +160,7 @@
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
             margin: 10px;
         }
-
-        .btn-main:hover {
-            background: var(--neon-blue);
-            color: black;
-            box-shadow: 0 0 30px var(--neon-blue);
-        }
+        .btn-main:hover { background: var(--neon-blue); color: black; box-shadow: 0 0 30px var(--neon-blue); }
 
         .btn-secondary {
             background: transparent;
@@ -151,12 +174,17 @@
             transition: 0.3s;
             margin: 10px;
         }
+        .btn-secondary:hover { background: var(--neon-green); color: black; box-shadow: 0 0 20px var(--neon-green); }
+        
+        /* Specifieke knop stijlen */
+        .btn-shop { border-color: var(--neon-gold); color: var(--neon-gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+        .btn-shop:hover { background: var(--neon-gold); color: black; box-shadow: 0 0 30px var(--neon-gold); }
+        
+        .btn-spin { border-color: var(--neon-pink); color: var(--neon-pink); box-shadow: 0 0 15px rgba(255, 0, 85, 0.3); }
+        .btn-spin:hover { background: var(--neon-pink); color: black; box-shadow: 0 0 30px var(--neon-pink); }
 
-        .btn-secondary:hover {
-            background: var(--neon-green);
-            color: black;
-            box-shadow: 0 0 20px var(--neon-green);
-        }
+        .btn-skip { border-color: #666; color: #999; }
+        .btn-skip:hover { border-color: white; color: white; background: rgba(255,255,255,0.1); }
 
         .btn-back {
             margin-top: 20px;
@@ -170,84 +198,325 @@
             transition: 0.3s;
             text-decoration: none;
         }
-        .btn-back:hover {
-            color: white;
-            border-color: white;
+        .btn-back:hover { color: white; border-color: white; }
+
+        /* --- SHOP UI --- */
+        .shop-header {
+            width: 90%;
+            max-width: 1000px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--neon-gold);
+            padding-bottom: 10px;
+        }
+        .shop-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .shop-tab {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #555;
+            color: #888;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: 'Orbitron';
+            text-transform: uppercase;
+        }
+        .shop-tab.active {
+            border-color: var(--neon-gold);
+            color: var(--neon-gold);
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+        
+        /* Shop Grid (Voor items) */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(20,20,30,0.8);
+            border: 1px solid #444;
         }
 
-        /* --- Leaderboard Styles (FIXED FOR SCROLLING) --- */
+        .shop-item {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #333;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            transition: 0.2s;
+        }
+        .shop-item:hover { border-color: #666; }
+        .shop-item.owned { border-color: var(--neon-green); box-shadow: 0 0 5px rgba(0,255,0,0.1) inset; }
+        .shop-item.equipped { border-color: var(--neon-gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+        .item-preview {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            border: 2px solid #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .item-name { font-family: 'Orbitron'; font-size: 1rem; margin-bottom: 5px; color: white; }
+        .item-desc { font-size: 0.8rem; color: #aaa; margin-bottom: 10px; height: 35px; }
+        .item-price { color: var(--neon-gold); font-weight: bold; font-family: 'Orbitron'; margin-bottom: 10px; }
+        .btn-buy, .btn-equip {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Rajdhani';
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+        .btn-buy { background: #333; color: white; }
+        .btn-buy:not(:disabled):hover { background: var(--neon-green); color: black; }
+        .btn-buy:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-equip { background: var(--neon-blue); color: black; display: none; }
+        .btn-equip:hover { background: white; }
+        .equipped-badge {
+            position: absolute;
+            top: 5px; right: 5px;
+            color: var(--neon-gold);
+            font-size: 0.7rem;
+            font-family: 'Orbitron';
+            border: 1px solid var(--neon-gold);
+            padding: 2px 5px;
+            display: none;
+        }
+
+        /* --- CASINO UI UPDATES --- */
+        .casino-container {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Sub-menu voor games */
+        .casino-game-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .casino-tab-btn {
+            background: transparent;
+            border: 1px solid #555;
+            color: #888;
+            padding: 10px 20px;
+            font-family: 'Orbitron';
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+        .casino-tab-btn.active {
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.3);
+        }
+        .casino-tab-btn:hover { color: white; border-color: white; }
+
+        .casino-game-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* ROULETTE SPECIFIEK */
+        #rouletteCanvas {
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            margin-bottom: 20px;
+        }
+
+        .roulette-pointer {
+            position: absolute;
+            top: calc(50% - 260px); /* Aangepast op basis van canvas grootte */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; 
+            height: 0; 
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid white;
+            z-index: 2;
+            filter: drop-shadow(0 0 10px white);
+        }
+        
+        .roulette-result {
+            font-family: 'Orbitron';
+            font-size: 2rem;
+            margin-bottom: 20px;
+            min-height: 2.5rem;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        /* BLACKJACK SPECIFIEK */
+        .blackjack-table {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(0, 20, 0, 0.6);
+            border: 2px solid #0f0;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: inset 0 0 50px rgba(0,255,0,0.1);
+            min-height: 400px;
+        }
+
+        .bj-hand-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 140px;
+        }
+        .bj-label {
+            font-family: 'Orbitron';
+            font-size: 0.8rem;
+            color: #0f0;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .bj-cards-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Kaart Stijlen */
+        .card {
+            width: 60px;
+            height: 90px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 5px;
+            box-sizing: border-box;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: relative;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
+        }
+        .card.red { color: var(--neon-pink); border-color: var(--neon-pink); }
+        .card.black { color: white; border-color: white; }
+        .card-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+        }
+        .card-back {
+            background: repeating-linear-gradient(
+                45deg,
+                #222,
+                #222 5px,
+                #333 5px,
+                #333 10px
+            );
+            border-color: var(--neon-blue);
+        }
+
+        .bj-controls {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+        .bj-status {
+            font-family: 'Orbitron';
+            font-size: 1.2rem;
+            min-height: 1.5rem;
+            text-align: center;
+        }
+        .bj-bet-controls { display: flex; gap: 10px; }
+        .bj-play-controls { display: none; gap: 10px; }
+        
+        .btn-bet {
+            background: transparent;
+            border: 1px solid var(--neon-gold);
+            color: var(--neon-gold);
+            padding: 10px 20px;
+            font-family: 'Rajdhani';
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-bet:hover:not(:disabled) { background: var(--neon-gold); color: black; }
+        .btn-bet:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .btn-action {
+            background: transparent;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 10px 20px;
+            font-family: 'Orbitron';
+            font-size: 0.9rem;
+            cursor: pointer;
+            min-width: 100px;
+        }
+        .btn-action:hover { background: var(--neon-blue); color: black; }
+        .btn-hit { border-color: var(--neon-green); color: var(--neon-green); }
+        .btn-hit:hover { background: var(--neon-green); color: black; }
+        .btn-stand { border-color: var(--neon-pink); color: var(--neon-pink); }
+        .btn-stand:hover { background: var(--neon-pink); color: black; }
+
+
+        .shop-grid::-webkit-scrollbar { width: 8px; }
+        .shop-grid::-webkit-scrollbar-track { background: #000; }
+        .shop-grid::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        .shop-grid::-webkit-scrollbar-thumb:hover { background: var(--neon-gold); }
+
+        /* --- Leaderboard --- */
         .leaderboard-container {
             background: rgba(10, 10, 20, 0.9);
             border: 2px solid var(--neon-blue);
-            padding: 20px; /* Verkleinde padding */
+            padding: 20px;
             min-width: 400px;
-            max-width: 90vw; /* Responsief */
-            max-height: 60vh; /* Max hoogte van container */
-            overflow-y: auto; /* Scrollbalk inschakelen */
+            max-width: 90vw;
+            max-height: 60vh;
+            overflow-y: auto;
             box-shadow: 0 0 30px rgba(0, 243, 255, 0.1);
             position: relative;
             display: flex;
             flex-direction: column;
         }
-
-        /* Stijl voor de scrollbar in Cyberpunk look */
-        .leaderboard-container::-webkit-scrollbar {
-            width: 8px;
-        }
-        .leaderboard-container::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.5);
-        }
-        .leaderboard-container::-webkit-scrollbar-thumb {
-            background: var(--neon-blue);
-            border-radius: 4px;
-        }
-        .leaderboard-container::-webkit-scrollbar-thumb:hover {
-            background: white;
-        }
-        
-        .leaderboard-container::before {
-            content: ''; position: absolute; top: -5px; left: -5px; width: 20px; height: 20px; border-top: 4px solid white; border-left: 4px solid white; pointer-events: none;
-        }
-        .leaderboard-container::after {
-            content: ''; position: absolute; bottom: -5px; right: -5px; width: 20px; height: 20px; border-bottom: 4px solid white; border-right: 4px solid white; pointer-events: none;
-        }
-
-        .score-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.5rem;
-            margin-top: 10px;
-        }
-
-        .score-table th {
-            text-align: left;
-            color: #888;
-            padding: 10px;
-            border-bottom: 1px solid #444;
-            font-size: 1rem;
-            font-family: 'Orbitron', sans-serif;
-            position: sticky; /* Header bovenaan houden bij scrollen */
-            top: 0;
-            background: rgba(10, 10, 20, 0.95);
-            z-index: 1;
-        }
-
-        .score-table td {
-            padding: 8px 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        
+        .leaderboard-container::-webkit-scrollbar { width: 8px; }
+        .leaderboard-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
+        .leaderboard-container::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 4px; }
+        .score-table { width: 100%; border-collapse: collapse; font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; margin-top: 10px; }
+        .score-table th { text-align: left; color: #888; padding: 10px; border-bottom: 1px solid #444; font-size: 1rem; font-family: 'Orbitron', sans-serif; position: sticky; top: 0; background: rgba(10, 10, 20, 0.95); }
+        .score-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .score-rank { color: var(--neon-yellow); width: 50px; text-align: center; }
         .score-name { color: white; }
         .score-val { color: var(--neon-green); text-align: right; font-weight: bold; }
-
-        /* High Score Input */
-        #highScoreInputContainer {
-            text-align: center;
-            display: none;
-        }
-
+        #highScoreInputContainer { text-align: center; display: none; }
         .name-input {
             background: transparent;
             border: 2px solid var(--neon-yellow);
@@ -261,10 +530,7 @@
             text-transform: uppercase;
             outline: none;
         }
-
-        .name-input::placeholder {
-            color: rgba(255, 255, 0, 0.3);
-        }
+        .name-input::placeholder { color: rgba(255, 255, 0, 0.3); }
     </style>
 </head>
 <body>
@@ -277,6 +543,9 @@
         <div class="hud-top">
             <div id="score">SCORE: 000000</div>
             <div id="level">SECTOR: 1</div>
+            <div class="coin-display">
+                <span>●</span> <span id="coinCounter">0</span>
+            </div>
         </div>
         <div class="hud-bottom">
             <div>
@@ -295,28 +564,114 @@
     <div id="startScreen" class="screen">
         <h1>Aetheria</h1>
         <h2>Titan Protocol Active</h2>
+        
+        <!-- Difficulty Select -->
+        <div style="font-family:'Orbitron'; font-size: 0.8rem; margin-bottom: 10px; color:#aaa;">KIES MOEILIJKHEID</div>
+        <div class="difficulty-container">
+            <button class="diff-btn" onclick="setDifficulty('easy')" id="diff-easy">MAKKELIJK</button>
+            <button class="diff-btn active" onclick="setDifficulty('medium')" id="diff-medium">GEMIDDELD</button>
+            <button class="diff-btn" onclick="setDifficulty('hard')" id="diff-hard">MOEILIJK</button>
+        </div>
+
         <button class="btn-main" id="startBtn">Initialiseren Missie</button>
+        <button class="btn-main btn-shop" id="shopBtn">Winkel</button>
         <button class="btn-secondary" id="viewLeaderboardBtn">Ranglijst</button>
         <br>
         <a href="index.html" class="btn-back">← Terug naar Nexus</a>
     </div>
 
+    <!-- Shop Screen -->
+    <div id="shopScreen" class="screen hidden">
+        <div class="shop-header">
+            <h1 style="font-size: 2.5rem; margin:0;">Winkel</h1>
+            <div class="coin-display" style="font-size: 1.5rem;">
+                <span>●</span> <span id="shopCoinCounter">0</span>
+            </div>
+        </div>
+
+        <div class="shop-tabs">
+            <div class="shop-tab active" onclick="window.switchTab('colors')">Raket Kleuren</div>
+            <div class="shop-tab" onclick="window.switchTab('backgrounds')">Achtergronden</div>
+            <div class="shop-tab" onclick="window.switchTab('powerups')">Power-ups</div>
+            <div class="shop-tab" onclick="window.switchTab('casino')" style="color:var(--neon-pink); border-color:var(--neon-pink);">GOKKEN</div>
+        </div>
+
+        <div class="shop-grid" id="shopGrid"></div>
+
+        <div class="casino-container" id="casinoContainer">
+            
+            <!-- Casino Sub-menu -->
+            <div class="casino-game-selector">
+                <button class="casino-tab-btn active" id="btn-select-roulette" onclick="window.openCasinoGame('roulette')">ROULETTE</button>
+                <button class="casino-tab-btn" id="btn-select-blackjack" onclick="window.openCasinoGame('blackjack')">BLACKJACK</button>
+            </div>
+
+            <!-- ROULETTE GAME -->
+            <div id="game-roulette" class="casino-game-panel">
+                <div class="roulette-pointer"></div>
+                <canvas id="rouletteCanvas" width="400" height="400"></canvas>
+                <div class="roulette-result" id="rouletteResult">DRAAI VOOR 100 MUNTEN</div>
+                <button class="btn-main btn-spin" id="spinBtn" onclick="spinRoulette()">DRAAIEN (-100)</button>
+            </div>
+
+            <!-- BLACKJACK GAME -->
+            <div id="game-blackjack" class="casino-game-panel hidden">
+                <div class="blackjack-table">
+                    <div class="bj-hand-area">
+                        <div class="bj-label">DEALER <span id="dealer-score"></span></div>
+                        <div class="bj-cards-container" id="dealer-cards"></div>
+                    </div>
+                    
+                    <div style="flex-grow: 1;"></div>
+
+                    <div class="bj-hand-area">
+                        <div class="bj-label">SPELER <span id="player-score"></span></div>
+                        <div class="bj-cards-container" id="player-cards"></div>
+                    </div>
+
+                    <div class="bj-controls">
+                        <div class="bj-status" id="bj-message" style="color: var(--neon-gold)">Plaats je inzet</div>
+                        
+                        <div class="bj-bet-controls" id="bj-bet-panel">
+                            <button class="btn-bet" onclick="placeBet(10)">10</button>
+                            <button class="btn-bet" onclick="placeBet(50)">50</button>
+                            <button class="btn-bet" onclick="placeBet(100)">100</button>
+                            <button class="btn-bet" onclick="placeBet('all')">ALL IN</button>
+                        </div>
+
+                        <div class="bj-play-controls" id="bj-play-panel">
+                            <button class="btn-action btn-hit" onclick="bjHit()">Nog EEN KAART</button>
+                            <button class="btn-action btn-stand" onclick="bjStand()">PASSEN</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <br>
+        <button class="btn-back" id="backToMenuFromShopBtn">TERUG</button>
+    </div>
+
     <!-- Game Over Screen -->
     <div id="gameOverScreen" class="screen hidden">
-        <!-- Standard Game Over Content -->
         <div id="standardGameOverContent" style="text-align: center;">
             <h1 style="color: var(--neon-pink); text-shadow: 0 0 20px var(--neon-pink);">Mission Failed</h1>
             <h2 id="finalScore">Score: 0</h2>
+            <p style="color: var(--neon-gold); font-family:'Orbitron'">Munten Verdiend: <span id="coinsEarned">0</span></p>
             <button class="btn-main" id="restartBtn">Opnieuw Starten</button>
+            <br>
+            <button class="btn-secondary btn-skip" id="skipToMenuBtn">Terug naar Menu (Sla Score Over)</button>
         </div>
 
-        <!-- High Score Input Content -->
         <div id="highScoreInputContainer">
             <h1 style="color: var(--neon-yellow); text-shadow: 0 0 20px var(--neon-yellow);">NIEUW RECORD!</h1>
             <h2 id="highScoreDisplay">Score: 0</h2>
             <input type="text" id="playerNameInput" class="name-input" placeholder="NAAM" maxlength="12">
             <br>
             <button class="btn-main" id="saveScoreBtn">OPSLAAN</button>
+            <br><br>
+            <button class="btn-secondary btn-skip" id="cancelHighScoreBtn">Annuleren</button>
         </div>
 
         <br>
@@ -335,9 +690,7 @@
                         <th class="score-val">SCORE</th>
                     </tr>
                 </thead>
-                <tbody id="leaderboardBody">
-                    <!-- Scores inserted via JS -->
-                </tbody>
+                <tbody id="leaderboardBody"></tbody>
             </table>
         </div>
         <br>
@@ -348,23 +701,114 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // UI Elements
+        // --- MOEILIJKHEID CONFIGURATIE ---
+        let currentDifficulty = 'medium'; 
+
+        const difficulties = {
+            easy: { speedMult: 0.8, hpMult: 0.7, coinMult: 0.5, spawnMod: 1.3 },
+            medium: { speedMult: 1.0, hpMult: 1.0, coinMult: 1.0, spawnMod: 1.0 },
+            hard: { speedMult: 1.3, hpMult: 1.5, coinMult: 2.0, spawnMod: 0.7 }
+        };
+
+        window.setDifficulty = function(diff) {
+            currentDifficulty = diff;
+            document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('diff-' + diff).classList.add('active');
+        }
+
+        // --- DATA & SHOP CONFIG ---
+        const SHOP_STORAGE_KEY = 'aetheria_shop_data';
+        const LEADERBOARD_STORAGE_KEY = 'aetheria_highscores';
+        
+        const shopCatalog = [
+            { id: 'c_yellow', name: 'Standard Laser', type: 'colors', price: 0, value: '#ffff00', desc: 'De basis lading.' },
+            { id: 'c_blue', name: 'Cyan Pulse', type: 'colors', price: 100, value: '#00f3ff', desc: 'Scherp en koel.' },
+            { id: 'c_green', name: 'Toxic Waste', type: 'colors', price: 250, value: '#00ff00', desc: 'Straalt gevaar uit.' },
+            { id: 'c_red', name: 'Crimson Fury', type: 'colors', price: 500, value: '#ff0000', desc: 'Pure agressie.' },
+            
+            { id: 'bg_stars', name: 'Deep Space', type: 'backgrounds', price: 0, value: 'stars', desc: 'Het standaard universum.' },
+            { id: 'bg_grid', name: 'Cyber Grid', type: 'backgrounds', price: 400, value: 'grid', desc: 'Retro synthwave vibe.' },
+            { id: 'bg_war', name: 'Red Alert', type: 'backgrounds', price: 800, value: 'redalert', desc: 'Oorlog voeren in de hel.' },
+            
+            { id: 'p_shield', name: 'Hull Plating', type: 'powerups', price: 1000, value: 'shield', desc: 'Start met +20 Max HP.' },
+            { id: 'p_speed', name: 'Afterburner', type: 'powerups', price: 1500, value: 'speed', desc: 'Verhoog snelheid met 15%.' },
+            { id: 'p_damage', name: 'Photon Amp', type: 'powerups', price: 2500, value: 'damage', desc: 'Vijanden hebben 1 minder HP.' }
+        ];
+
+        const defaultData = {
+            coins: 0,
+            inventory: { colors: 'c_yellow', backgrounds: 'bg_stars', powerups: [] },
+            ownedItems: ['c_yellow', 'bg_stars']
+        };
+
+        let gameData = { ...defaultData };
+
+        try {
+            const savedString = localStorage.getItem(SHOP_STORAGE_KEY);
+            if (savedString) {
+                const saved = JSON.parse(savedString);
+                if (typeof saved.coins === 'number') gameData.coins = saved.coins;
+                if (saved.inventory) {
+                    if (saved.inventory.colors) gameData.inventory.colors = saved.inventory.colors;
+                    if (saved.inventory.backgrounds) gameData.inventory.backgrounds = saved.inventory.backgrounds;
+                    if (Array.isArray(saved.inventory.powerups)) gameData.inventory.powerups = saved.inventory.powerups;
+                }
+                if (Array.isArray(saved.ownedItems)) gameData.ownedItems = saved.ownedItems;
+            }
+        } catch (e) {
+            console.warn("Save data corrupt, resetting.", e);
+            localStorage.removeItem(SHOP_STORAGE_KEY);
+        }
+
+        function saveGameData() {
+            localStorage.setItem(SHOP_STORAGE_KEY, JSON.stringify(gameData));
+            updateCoinUI();
+            updateBetButtons(); // Update blackjack knoppen ook
+        }
+
+        function updateCoinUI() {
+            const el1 = document.getElementById('coinCounter');
+            const el2 = document.getElementById('shopCoinCounter');
+            const el3 = document.getElementById('spinBtn');
+            if(el1) el1.innerText = gameData.coins;
+            if(el2) el2.innerText = gameData.coins;
+            if(el3) {
+                if(gameData.coins < 100) el3.style.opacity = '0.3';
+                else el3.style.opacity = '1';
+            }
+        }
+        
+        let highScores = [];
+        try {
+            highScores = JSON.parse(localStorage.getItem(LEADERBOARD_STORAGE_KEY)) || [];
+        } catch (e) { highScores = []; }
+
+        function updateLeaderboardUI() {
+            const leaderboardBody = document.getElementById('leaderboardBody');
+            if(!leaderboardBody) return;
+            leaderboardBody.innerHTML = '';
+            highScores.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td class="score-rank">${index + 1}</td><td class="score-name">${entry.name}</td><td class="score-val">${entry.score}</td>`;
+                leaderboardBody.appendChild(row);
+            });
+        }
+
+        // --- UI ELEMENTEN ---
         const scoreEl = document.getElementById('score');
         const levelEl = document.getElementById('level');
         const healthBar = document.getElementById('healthBar');
         const startScreen = document.getElementById('startScreen');
+        const shopScreen = document.getElementById('shopScreen');
         const gameOverScreen = document.getElementById('gameOverScreen');
-        const finalScoreEl = document.getElementById('finalScore');
         const leaderboardScreen = document.getElementById('leaderboardScreen');
-        const leaderboardBody = document.getElementById('leaderboardBody');
-
-        // High Score Elements
+        const finalScoreEl = document.getElementById('finalScore');
+        const coinsEarnedEl = document.getElementById('coinsEarned');
         const standardGameOverContent = document.getElementById('standardGameOverContent');
         const highScoreInputContainer = document.getElementById('highScoreInputContainer');
         const highScoreDisplay = document.getElementById('highScoreDisplay');
         const playerNameInput = document.getElementById('playerNameInput');
-
-        // Resize Handling
+        
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -372,26 +816,20 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // Game State
         let gameRunning = false;
         let score = 0;
         let level = 1;
         let frames = 0;
-        
-        // Input Handling
+        let runCoinsEarned = 0;
+
         const keys = { w: false, a: false, s: false, d: false, space: false };
-        
         window.addEventListener('keydown', e => {
             if(e.code === 'KeyW' || e.code === 'ArrowUp') keys.w = true;
             if(e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = true;
             if(e.code === 'KeyS' || e.code === 'ArrowDown') keys.s = true;
             if(e.code === 'KeyD' || e.code === 'ArrowRight') keys.d = true;
-            if(e.code === 'Space') {
-                keys.space = true;
-                e.preventDefault(); 
-            }
+            if(e.code === 'Space') { keys.space = true; e.preventDefault(); }
         });
-        
         window.addEventListener('keyup', e => {
             if(e.code === 'KeyW' || e.code === 'ArrowUp') keys.w = false;
             if(e.code === 'KeyA' || e.code === 'ArrowLeft') keys.a = false;
@@ -400,71 +838,427 @@
             if(e.code === 'Space') keys.space = false;
         });
 
-        // --- LEADERBOARD LOGIC ---
-        const STORAGE_KEY = 'aetheria_highscores';
-        let highScores = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        // --- SHOP & CASINO LOGIC ---
+        let currentTab = 'colors';
+        let currentCasinoGame = 'roulette';
 
-        function updateLeaderboardUI() {
-            leaderboardBody.innerHTML = '';
-            highScores.forEach((entry, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="score-rank">${index + 1}</td>
-                    <td class="score-name">${entry.name}</td>
-                    <td class="score-val">${entry.score}</td>
+        // --- ROULETTE LOGIC ---
+        const rouletteCanvas = document.getElementById('rouletteCanvas');
+        const rCtx = rouletteCanvas.getContext('2d');
+        let rouletteAngle = 0;
+        let rouletteVelocity = 0;
+        let isSpinning = false;
+        const SPIN_COST = 100;
+        
+        const segments = [
+            { mult: 0, color: '#ff0055', label: '0x' },
+            { mult: 0, color: '#ff0055', label: '0x' },
+            { mult: 0, color: '#ff0055', label: '0x' },
+            { mult: 0, color: '#ff0055', label: '0x' },
+            { mult: 0, color: '#ff0055', label: '0x' },
+            { mult: 0, color: '#ff0055', label: '0x' },
+            { mult: 0, color: '#ff0055', label: '0x' },
+            { mult: 5, color: '#ffd700', label: 'JACKPOT' }
+        ];
+        const arc = (2 * Math.PI) / segments.length;
+
+        function drawRoulette() {
+            if (!rCtx) return;
+            rCtx.clearRect(0, 0, rouletteCanvas.width, rouletteCanvas.height);
+            rCtx.save();
+            rCtx.translate(200, 200); // Center
+            rCtx.rotate(rouletteAngle);
+
+            segments.forEach((seg, i) => {
+                const angle = i * arc;
+                rCtx.beginPath();
+                rCtx.fillStyle = seg.color;
+                rCtx.moveTo(0, 0);
+                rCtx.arc(0, 0, 180, angle, angle + arc);
+                rCtx.lineTo(0, 0);
+                rCtx.fill();
+                rCtx.stroke();
+
+                rCtx.save();
+                rCtx.fillStyle = "white";
+                rCtx.translate(Math.cos(angle + arc/2) * 130, Math.sin(angle + arc/2) * 130);
+                rCtx.rotate(angle + arc/2 + Math.PI/2);
+                rCtx.font = "bold 20px Rajdhani";
+                rCtx.fillText(seg.label, -15, 5);
+                rCtx.restore();
+            });
+
+            rCtx.restore();
+            rCtx.beginPath();
+            rCtx.arc(200, 200, 10, 0, Math.PI*2);
+            rCtx.fillStyle = '#fff';
+            rCtx.fill();
+        }
+
+        function updateRoulette() {
+            if (isSpinning) {
+                rouletteAngle += rouletteVelocity;
+                rouletteVelocity *= 0.985; 
+
+                if (rouletteVelocity < 0.002) {
+                    isSpinning = false;
+                    rouletteVelocity = 0;
+                    calculateRouletteResult();
+                }
+                drawRoulette();
+                requestAnimationFrame(updateRoulette);
+            }
+        }
+
+        window.spinRoulette = function() {
+            if (isSpinning) return;
+            if (gameData.coins < SPIN_COST) {
+                document.getElementById('rouletteResult').innerText = "TE WEINIG MUNTEN";
+                document.getElementById('rouletteResult').style.color = "#555";
+                return;
+            }
+            
+            gameData.coins -= SPIN_COST;
+            saveGameData();
+            document.getElementById('rouletteResult').innerText = "DRAAIEN...";
+            document.getElementById('rouletteResult').style.color = "white";
+
+            rouletteVelocity = 0.3 + Math.random() * 0.2; 
+            isSpinning = true;
+            updateRoulette();
+        }
+
+        function calculateRouletteResult() {
+            let normalizedAngle = rouletteAngle % (2 * Math.PI);
+            let index = Math.floor(((2 * Math.PI) - normalizedAngle + (3 * Math.PI / 2)) % (2 * Math.PI) / arc) % 8;
+            index = Math.floor((2 * Math.PI - normalizedAngle + 1.5 * Math.PI) % (2 * Math.PI) / arc);
+
+            const result = segments[Math.abs(index)]; 
+            const winAmount = SPIN_COST * result.mult;
+            
+            gameData.coins += winAmount;
+            saveGameData();
+
+            const resultEl = document.getElementById('rouletteResult');
+            if (result.mult === 0) {
+                resultEl.innerText = "GEWONNEN: 0";
+                resultEl.style.color = "#ff0055";
+            } else {
+                resultEl.innerText = "GEWONNEN: " + winAmount;
+                resultEl.style.color = "#ffd700";
+            }
+        }
+
+        // --- BLACKJACK LOGIC ---
+        const suits = ['♠', '♥', '♦', '♣'];
+        const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+        let deck = [];
+        let playerHand = [];
+        let dealerHand = [];
+        let bjBet = 0;
+        let bjGameActive = false;
+
+        function createDeck() {
+            deck = [];
+            for(let s of suits) {
+                for(let v of values) {
+                    let weight = parseInt(v);
+                    if (['J', 'Q', 'K'].includes(v)) weight = 10;
+                    if (v === 'A') weight = 11;
+                    deck.push({ suit: s, value: v, weight: weight });
+                }
+            }
+            // Shuffle
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function getCardHTML(card, hidden = false) {
+            if(hidden) {
+                return `<div class="card card-back"></div>`;
+            }
+            const isRed = card.suit === '♥' || card.suit === '♦';
+            return `
+                <div class="card ${isRed ? 'red' : 'black'}">
+                    <div>${card.value}</div>
+                    <div class="card-center">${card.suit}</div>
+                    <div style="transform: rotate(180deg);">${card.value}</div>
+                </div>
+            `;
+        }
+
+        function calculateHand(hand) {
+            let score = 0;
+            let aces = 0;
+            for(let card of hand) {
+                score += card.weight;
+                if(card.value === 'A') aces++;
+            }
+            while(score > 21 && aces > 0) {
+                score -= 10;
+                aces--;
+            }
+            return score;
+        }
+
+        function renderBJTable(hideDealer = true) {
+            const dealerContainer = document.getElementById('dealer-cards');
+            const playerContainer = document.getElementById('player-cards');
+            
+            dealerContainer.innerHTML = dealerHand.map((c, i) => getCardHTML(c, hideDealer && i === 1)).join('');
+            playerContainer.innerHTML = playerHand.map(c => getCardHTML(c)).join('');
+
+            document.getElementById('player-score').innerText = `(${calculateHand(playerHand)})`;
+            document.getElementById('dealer-score').innerText = hideDealer ? "" : `(${calculateHand(dealerHand)})`;
+        }
+
+        window.placeBet = function(amount) {
+            if(bjGameActive) return;
+            
+            if(amount === 'all') amount = gameData.coins;
+            if(amount > gameData.coins) {
+                document.getElementById('bj-message').innerText = "Niet genoeg munten!";
+                document.getElementById('bj-message').style.color = "var(--neon-pink)";
+                return;
+            }
+            if(amount <= 0) return;
+
+            bjBet = amount;
+            gameData.coins -= bjBet;
+            saveGameData();
+
+            startBlackjackRound();
+        };
+
+        function startBlackjackRound() {
+            bjGameActive = true;
+            createDeck();
+            playerHand = [deck.pop(), deck.pop()];
+            dealerHand = [deck.pop(), deck.pop()];
+
+            document.getElementById('bj-bet-panel').style.display = 'none';
+            document.getElementById('bj-play-panel').style.display = 'flex';
+            
+            // Check instant Blackjack
+            const pScore = calculateHand(playerHand);
+            if(pScore === 21) {
+                renderBJTable(false); // Show dealer cards immediately
+                endBlackjackRound();
+                return;
+            }
+
+            renderBJTable(true);
+            document.getElementById('bj-message').innerText = `Inzet: ${bjBet}`;
+            document.getElementById('bj-message').style.color = "var(--neon-gold)";
+        }
+
+        window.bjHit = function() {
+            playerHand.push(deck.pop());
+            renderBJTable(true);
+            if(calculateHand(playerHand) > 21) {
+                endBlackjackRound();
+            }
+        };
+
+        window.bjStand = function() {
+            // Dealer turn
+            let dScore = calculateHand(dealerHand);
+            while(dScore < 17) {
+                dealerHand.push(deck.pop());
+                dScore = calculateHand(dealerHand);
+            }
+            endBlackjackRound();
+        };
+
+        function endBlackjackRound() {
+            bjGameActive = false;
+            renderBJTable(false); // Reveal dealer
+
+            const pScore = calculateHand(playerHand);
+            const dScore = calculateHand(dealerHand);
+            const msgEl = document.getElementById('bj-message');
+
+            let winAmount = 0;
+            let message = "";
+
+            if (pScore > 21) {
+                message = "JE HEBT BUSTED!";
+                msgEl.style.color = "var(--neon-pink)";
+            } else if (dScore > 21) {
+                message = "DEALER BUST! JE WINT!";
+                winAmount = bjBet * 2;
+                msgEl.style.color = "var(--neon-green)";
+            } else if (pScore > dScore) {
+                message = "JE WINT!";
+                // Blackjack pays 3:2 usually, keeping simple 2:1 or bonus for 21
+                if(pScore === 21 && playerHand.length === 2) {
+                    message = "BLACKJACK! (3:2)";
+                    winAmount = bjBet + (bjBet * 1.5);
+                } else {
+                    winAmount = bjBet * 2;
+                }
+                msgEl.style.color = "var(--neon-green)";
+            } else if (pScore < dScore) {
+                message = "DEALER WINT.";
+                msgEl.style.color = "var(--neon-pink)";
+            } else {
+                message = "GELIJKSPEL (PUSH)";
+                winAmount = bjBet; // Return bet
+                msgEl.style.color = "#fff";
+            }
+
+            gameData.coins += Math.floor(winAmount);
+            saveGameData();
+
+            document.getElementById('bj-message').innerText = `${message} +${Math.floor(winAmount - bjBet)}`;
+            
+            // Reset UI after delay
+            setTimeout(() => {
+                document.getElementById('bj-bet-panel').style.display = 'flex';
+                document.getElementById('bj-play-panel').style.display = 'none';
+                playerHand = [];
+                dealerHand = [];
+                document.getElementById('dealer-cards').innerHTML = '';
+                document.getElementById('player-cards').innerHTML = '';
+                document.getElementById('dealer-score').innerText = '';
+                document.getElementById('player-score').innerText = '';
+                document.getElementById('bj-message').innerText = "Plaats je inzet";
+                document.getElementById('bj-message').style.color = "var(--neon-gold)";
+            }, 3000);
+        }
+
+        function updateBetButtons() {
+            // Op dit moment simpel, eventueel visuele feedback toevoegen indien nodig
+        }
+
+
+        // --- TAB & NAVIGATIE LOGIC ---
+
+        window.switchTab = function(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.shop-tab[onclick="window.switchTab('${tabName}')"]`).classList.add('active');
+            
+            const grid = document.getElementById('shopGrid');
+            const casino = document.getElementById('casinoContainer');
+
+            if(tabName === 'casino') {
+                grid.style.display = 'none';
+                casino.style.display = 'flex';
+                if(currentCasinoGame === 'roulette') drawRoulette();
+            } else {
+                grid.style.display = 'grid';
+                casino.style.display = 'none';
+                renderShop();
+            }
+        }
+
+        window.openCasinoGame = function(gameName) {
+            currentCasinoGame = gameName;
+            
+            // Update buttons
+            document.querySelectorAll('.casino-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-select-${gameName}`).classList.add('active');
+
+            // Toggle Panels
+            document.getElementById('game-roulette').classList.add('hidden');
+            document.getElementById('game-blackjack').classList.add('hidden');
+            document.getElementById(`game-${gameName}`).classList.remove('hidden');
+
+            if(gameName === 'roulette') {
+                drawRoulette();
+            }
+        }
+
+        function renderShop() {
+            const grid = document.getElementById('shopGrid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            shopCatalog.forEach(item => {
+                if(item.type !== currentTab) return;
+                const isOwned = gameData.ownedItems.includes(item.id);
+                let isEquipped = false;
+                if(currentTab === 'colors' && gameData.inventory.colors === item.id) isEquipped = true;
+                if(currentTab === 'backgrounds' && gameData.inventory.backgrounds === item.id) isEquipped = true;
+                if(currentTab === 'powerups' && gameData.inventory.powerups.includes(item.id)) isEquipped = true;
+
+                const el = document.createElement('div');
+                el.className = `shop-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}`;
+                
+                let previewStyle = '';
+                if(item.type === 'colors') previewStyle = `background: ${item.value}; box-shadow: 0 0 10px ${item.value};`;
+                else if(item.type === 'backgrounds') {
+                    if(item.value === 'grid') previewStyle = 'background: linear-gradient(45deg, #111 25%, transparent 25%), linear-gradient(-45deg, #111 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #111 75%), linear-gradient(-45deg, transparent 75%, #111 75%); background-color: #050505; background-size: 10px 10px;';
+                    else if(item.value === 'redalert') previewStyle = 'background: #300; border-color: #f00;';
+                    else previewStyle = 'background: #fff; opacity: 0.2;';
+                } else if(item.type === 'powerups') {
+                    previewStyle = 'background: var(--neon-blue); font-size: 0.8rem; color: black; border:none;';
+                }
+
+                el.innerHTML = `
+                    <div class="item-preview" style="${previewStyle}">${item.type==='powerups'?'⚡':''}</div>
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-desc">${item.desc}</div>
+                    <div class="item-price">${item.price === 0 ? 'GRATIS' : item.price + ' Munten'}</div>
+                    ${!isOwned ? 
+                        `<button class="btn-buy" onclick="window.buyItem('${item.id}')" ${gameData.coins < item.price ? 'disabled' : ''}>KOPEN</button>` : 
+                        `<button class="btn-equip" style="display:${item.type === 'powerups' ? 'none' : 'block'}" onclick="window.equipItem('${item.id}')">${isEquipped ? 'GEDRAGEN' : 'UIRUSTEN'}</button>
+                         <div class="equipped-badge" style="display:${isEquipped ? 'block' : 'none'}">ACTIEF</div>`
+                    }
                 `;
-                leaderboardBody.appendChild(row);
+                grid.appendChild(el);
             });
         }
 
-        function checkHighScore(currentScore) {
-            // We staan nu Top 20 toe in plaats van Top 5
-            if (highScores.length < 20) {
-                return true;
-            }
-            const lowestScore = highScores[highScores.length - 1].score;
-            return currentScore > lowestScore;
+        window.buyItem = function(id) {
+            const item = shopCatalog.find(i => i.id === id);
+            if(!item || gameData.coins < item.price) return;
+            gameData.coins -= item.price;
+            gameData.ownedItems.push(item.id);
+            if(item.type === 'powerups') gameData.inventory.powerups.push(id);
+            saveGameData();
+            renderShop();
         }
 
-        function saveHighScore(name, currentScore) {
-            const newEntry = { name: name.toUpperCase(), score: currentScore };
-            
-            // Voeg nieuwe score toe
-            highScores.push(newEntry);
-            
-            // Sorteer van hoog naar laag
-            highScores.sort((a, b) => b.score - a.score);
-            
-            // FIX: Houd top 20 vast (in plaats van 5)
-            if (highScores.length > 20) {
-                highScores = highScores.slice(0, 20);
-            }
-            
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(highScores));
-            updateLeaderboardUI();
+        window.equipItem = function(id) {
+            const item = shopCatalog.find(i => i.id === id);
+            if(!item) return;
+            gameData.inventory[item.type] = id;
+            saveGameData();
+            renderShop();
         }
 
-        // --- GAME CLASSES ---
+        // --- GAME LOGIC ---
+
         class Player {
             constructor() {
                 this.x = canvas.width / 2;
                 this.y = canvas.height - 100;
-                this.size = 20;
-                this.speed = 7;
+                this.baseSize = 20;
+                this.baseSpeed = 7;
+                const upgrades = Array.isArray(gameData.inventory.powerups) ? gameData.inventory.powerups : [];
+                this.hasSpeedUpgrade = upgrades.includes('p_speed');
+                this.hasShieldUpgrade = upgrades.includes('p_shield');
+                this.speed = this.hasSpeedUpgrade ? this.baseSpeed * 1.15 : this.baseSpeed;
+                this.maxHealth = this.hasShieldUpgrade ? 120 : 100;
+                this.health = this.maxHealth;
                 this.color = '#00f3ff';
-                this.health = 100;
-                this.maxHealth = 100;
                 this.lastShot = 0;
+                this.bulletColor = '#ffff00';
+                const equippedColorId = gameData.inventory.colors || 'c_yellow';
+                const colorItem = shopCatalog.find(i => i.id === equippedColorId);
+                if(colorItem) this.bulletColor = colorItem.value;
             }
 
             update() {
-                if(keys.w && this.y > this.size) this.y -= this.speed;
-                if(keys.s && this.y < canvas.height - this.size) this.y += this.speed;
-                if(keys.a && this.x > this.size) this.x -= this.speed;
-                if(keys.d && this.x < canvas.width - this.size) this.x += this.speed;
-
+                if(keys.w && this.y > this.baseSize) this.y -= this.speed;
+                if(keys.s && this.y < canvas.height - this.baseSize) this.y += this.speed;
+                if(keys.a && this.x > this.baseSize) this.x -= this.speed;
+                if(keys.d && this.x < canvas.width - this.baseSize) this.x += this.speed;
                 if(keys.space && Date.now() - this.lastShot > 120) {
-                    bullets.push(new Bullet(this.x, this.y - this.size));
+                    bullets.push(new Bullet(this.x, this.y - this.baseSize, this.bulletColor));
                     this.lastShot = Date.now();
                 }
             }
@@ -472,39 +1266,34 @@
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
-                
-                // Draw Ship
                 ctx.beginPath();
-                ctx.moveTo(0, -this.size);
-                ctx.lineTo(this.size, this.size);
-                ctx.lineTo(0, this.size * 0.6);
-                ctx.lineTo(-this.size, this.size);
+                ctx.moveTo(0, -this.baseSize);
+                ctx.lineTo(this.baseSize, this.baseSize);
+                ctx.lineTo(0, this.baseSize * 0.6);
+                ctx.lineTo(-this.baseSize, this.baseSize);
                 ctx.closePath();
-                
                 ctx.fillStyle = this.color;
                 ctx.shadowBlur = 15;
                 ctx.shadowColor = this.color;
                 ctx.fill();
-
-                // Engine flame
                 ctx.beginPath();
-                ctx.moveTo(-this.size * 0.5, this.size);
-                ctx.lineTo(this.size * 0.5, this.size);
-                ctx.lineTo(0, this.size + (Math.random() * 25 + 10));
+                ctx.moveTo(-this.baseSize * 0.5, this.baseSize);
+                ctx.lineTo(this.baseSize * 0.5, this.baseSize);
+                ctx.lineTo(0, this.baseSize + (Math.random() * 25 + 10));
                 ctx.fillStyle = '#ff0055';
                 ctx.shadowColor = '#ff0055';
                 ctx.fill();
-                
                 ctx.restore();
             }
         }
 
         class Bullet {
-            constructor(x, y) {
+            constructor(x, y, color) {
                 this.x = x;
                 this.y = y;
                 this.speed = 18; 
                 this.size = 4;
+                this.color = color;
                 this.markedForDeletion = false;
             }
             update() {
@@ -513,9 +1302,9 @@
             }
             draw() {
                 ctx.beginPath();
-                ctx.fillStyle = '#ffff00';
+                ctx.fillStyle = this.color;
                 ctx.shadowBlur = 10;
-                ctx.shadowColor = '#ffff00';
+                ctx.shadowColor = this.color;
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
                 ctx.fill();
             }
@@ -523,35 +1312,39 @@
 
         class Enemy {
             constructor() {
+                const diffConfig = difficulties[currentDifficulty];
+                const upgrades = Array.isArray(gameData.inventory.powerups) ? gameData.inventory.powerups : [];
                 this.x = Math.random() * (canvas.width - 100) + 50;
                 this.y = -100;
                 const rand = Math.random();
+                this.hasDmgUpgrade = upgrades.includes('p_damage');
 
                 if (rand < 0.05) {
-                    // --- GELE TITAN (BOSS) ---
                     this.isBoss = true;
                     this.isTank = false;
                     this.type = 'boss';
                     this.size = 40; 
                     this.color = '#ffff00'; 
-                    const baseHp = 3 + Math.floor(level / 2);
-                    this.maxHp = baseHp * 6;
+                    let baseHp = 3 + Math.floor(level / 2);
+                    this.maxHp = Math.ceil((baseHp * 6) * diffConfig.hpMult);
                     this.hp = this.maxHp;
-                    this.speed = Math.random() * 1 + 1 + (level * 0.2); 
-                    this.points = 3000; 
+                    this.speed = (Math.random() * 1 + 1 + (level * 0.2)) * diffConfig.speedMult; 
+                    this.points = 3000;
+                    this.coinValue = Math.ceil(10 * diffConfig.coinMult);
                 } else if (rand < 0.25) {
-                    // --- GROENE TANK ---
                     this.isBoss = false;
                     this.isTank = true;
                     this.type = 'tank';
                     this.size = Math.random() * 10 + 15; 
                     this.color = '#00ff00'; 
-                    this.maxHp = 3 + Math.floor(level / 2);
+                    let baseHp = 3 + Math.floor(level / 2);
+                    this.maxHp = Math.ceil(baseHp * diffConfig.hpMult);
+                    if(this.hasDmgUpgrade && this.maxHp > 1) this.maxHp -= 1; 
                     this.hp = this.maxHp;
-                    this.speed = Math.random() * 2 + 2 + (level * 0.5); 
+                    this.speed = (Math.random() * 2 + 2 + (level * 0.5)) * diffConfig.speedMult; 
                     this.points = 500;
+                    this.coinValue = Math.ceil(3 * diffConfig.coinMult);
                 } else {
-                    // --- STANDAARD (ROZE) ---
                     this.isBoss = false;
                     this.isTank = false;
                     this.type = 'standard';
@@ -559,8 +1352,9 @@
                     this.color = '#ff0055'; 
                     this.maxHp = 1;
                     this.hp = 1;
-                    this.speed = Math.random() * 4 + 3 + (level * 0.8);
+                    this.speed = (Math.random() * 4 + 3 + (level * 0.8)) * diffConfig.speedMult;
                     this.points = 150;
+                    this.coinValue = Math.ceil(1 * diffConfig.coinMult);
                 }
                 this.markedForDeletion = false;
                 this.angle = 0;
@@ -576,35 +1370,19 @@
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
-
                 if (this.isBoss) {
-                    // GELE TITAN
                     ctx.shadowBlur = 30;
                     ctx.shadowColor = this.color;
                     ctx.beginPath();
                     ctx.arc(0, 0, this.size, 0, Math.PI*2);
                     ctx.fillStyle = this.color;
                     ctx.fill();
-
                     ctx.beginPath();
                     ctx.arc(0, 0, this.size * 0.7, 0, Math.PI*2);
                     ctx.fillStyle = 'rgba(200, 200, 0, 0.5)';
                     ctx.fill();
-
-                    const barWidth = 60; 
-                    const barHeight = 8;  
-                    const yOffset = this.size + 20; 
-                    const hpPercent = this.hp / this.maxHp;
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-                    ctx.fillRect(-barWidth/2, yOffset, barWidth, barHeight);
-                    ctx.fillStyle = '#ffff00';
-                    ctx.fillRect(-barWidth/2, yOffset, barWidth * hpPercent, barHeight);
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(-barWidth/2, yOffset, barWidth, barHeight);
-
+                    this.drawHealthBar(60, 8, this.size + 20, this.color);
                 } else if (this.isTank) {
-                    // GROENE TANK
                     ctx.shadowBlur = 20;
                     ctx.shadowColor = this.color;
                     ctx.beginPath();
@@ -615,21 +1393,8 @@
                     ctx.arc(0, 0, this.size * 0.6, 0, Math.PI*2);
                     ctx.fillStyle = 'rgba(0,0,0,0.5)';
                     ctx.fill();
-
-                    const barWidth = 40;
-                    const barHeight = 6;
-                    const yOffset = this.size + 15; 
-                    const hpPercent = this.hp / this.maxHp;
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-                    ctx.fillRect(-barWidth/2, yOffset, barWidth, barHeight);
-                    ctx.fillStyle = '#00ff00';
-                    ctx.fillRect(-barWidth/2, yOffset, barWidth * hpPercent, barHeight);
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(-barWidth/2, yOffset, barWidth, barHeight);
-
+                    this.drawHealthBar(40, 6, this.size + 15, this.color);
                 } else {
-                    // STANDAARD (ZESHOEK)
                     ctx.rotate(this.angle);
                     ctx.shadowBlur = 10;
                     ctx.shadowColor = this.color;
@@ -645,8 +1410,18 @@
                     ctx.fillStyle = 'rgba(255, 0, 85, 0.2)';
                     ctx.fill();
                 }
-
                 ctx.restore();
+            }
+            
+            drawHealthBar(w, h, yOff, color) {
+                const hpPercent = this.hp / this.maxHp;
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(-w/2, yOff, w, h);
+                ctx.fillStyle = color;
+                ctx.fillRect(-w/2, yOff, w * hpPercent, h);
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(-w/2, yOff, w, h);
             }
         }
 
@@ -677,19 +1452,17 @@
         }
 
         class Star {
-            constructor() {
+            constructor() { this.reset(true); }
+            reset(randomY = false) {
                 this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
+                this.y = randomY ? Math.random() * canvas.height : -10;
                 this.size = Math.random() * 1.5;
                 this.speed = Math.random() * 0.5 + 0.1;
                 this.brightness = Math.random();
             }
             update() {
                 this.y += this.speed * 2 + (gameRunning ? 10 : 1); 
-                if(this.y > canvas.height) {
-                    this.y = 0;
-                    this.x = Math.random() * canvas.width;
-                }
+                if(this.y > canvas.height) this.reset();
             }
             draw() {
                 ctx.fillStyle = `rgba(255, 255, 255, ${this.brightness})`;
@@ -699,12 +1472,41 @@
             }
         }
 
-        // Game Objects
+        class BackgroundManager {
+            constructor() { this.gridOffset = 0; }
+            draw() {
+                const bgId = gameData.inventory && gameData.inventory.backgrounds ? gameData.inventory.backgrounds : 'bg_stars';
+                if(bgId === 'bg_stars') return; 
+                if(bgId === 'bg_grid') this.drawGrid();
+                else if(bgId === 'bg_war') {
+                    ctx.fillStyle = 'rgba(50, 0, 0, 0.3)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            drawGrid() {
+                ctx.strokeStyle = 'rgba(0, 243, 255, 0.15)';
+                ctx.lineWidth = 1;
+                const gridSize = 40;
+                this.gridOffset = (this.gridOffset + 2) % gridSize;
+                for(let x=0; x<=canvas.width; x+=gridSize) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+                }
+                for(let y=this.gridOffset; y<=canvas.height; y+=gridSize) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+                }
+                const grad = ctx.createLinearGradient(0, canvas.height-100, 0, canvas.height);
+                grad.addColorStop(0, 'transparent'); grad.addColorStop(1, 'rgba(0, 243, 255, 0.1)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, canvas.height-100, canvas.width, 100);
+            }
+        }
+
         let player;
         let bullets = [];
         let enemies = [];
         let particles = [];
         let stars = [];
+        const bgManager = new BackgroundManager();
 
         function init() {
             player = new Player();
@@ -714,13 +1516,16 @@
             score = 0;
             level = 1;
             frames = 0;
+            runCoinsEarned = 0;
             gameRunning = true;
+            
             scoreEl.innerText = "SCORE: 000000";
             levelEl.innerText = "SECTOR: 1";
             healthBar.style.width = "100%";
+            updateCoinUI();
             
-            // UI Reset
             startScreen.classList.add('hidden');
+            shopScreen.classList.add('hidden');
             gameOverScreen.classList.add('hidden');
             standardGameOverContent.style.display = 'block';
             highScoreInputContainer.style.display = 'none';
@@ -729,11 +1534,13 @@
             animate();
         }
 
-        // Create background stars
         for(let i=0; i<100; i++) stars.push(new Star());
 
         function spawnEnemies() {
-            if(frames % Math.max(10, 50 - level * 4) === 0) {
+            const diffConfig = difficulties[currentDifficulty];
+            const baseRate = 60 - (level * 4);
+            const currentRate = Math.max(10, Math.floor(baseRate * diffConfig.spawnMod));
+            if(frames % currentRate === 0) {
                 enemies.push(new Enemy());
             }
         }
@@ -747,19 +1554,21 @@
 
         function gameOver() {
             gameRunning = false;
+            gameData.coins += runCoinsEarned;
+            saveGameData();
+            
             gameOverScreen.classList.remove('hidden');
+            finalScoreEl.innerText = "Score: " + score;
+            coinsEarnedEl.innerText = runCoinsEarned;
 
-            if (checkHighScore(score)) {
-                // Show High Score Input
+            if (highScores.length < 20 || score > highScores[highScores.length - 1].score) {
                 standardGameOverContent.style.display = 'none';
                 highScoreInputContainer.style.display = 'block';
                 highScoreDisplay.innerText = "Score: " + score;
                 setTimeout(() => playerNameInput.focus(), 100);
             } else {
-                // Show Standard Game Over
                 standardGameOverContent.style.display = 'block';
                 highScoreInputContainer.style.display = 'none';
-                finalScoreEl.innerText = "Score: " + score;
             }
         }
 
@@ -767,29 +1576,28 @@
             if(!gameRunning) return;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            bgManager.draw();
+            
+            if(gameData.inventory.backgrounds !== 'bg_grid') {
+                stars.forEach(star => { star.update(); star.draw(); });
+            }
 
-            // Background
-            stars.forEach(star => { star.update(); star.draw(); });
-
-            // Player
             player.update();
             player.draw();
 
-            // Bullets
             bullets.forEach((bullet, bIndex) => {
                 bullet.update();
                 bullet.draw();
                 if(bullet.markedForDeletion) bullets.splice(bIndex, 1);
             });
 
-            // Enemies
             enemies.forEach((enemy, eIndex) => {
                 enemy.update();
                 enemy.draw();
 
-                // Collision: Enemy vs Player
                 const distPlayer = Math.hypot(player.x - enemy.x, player.y - enemy.y);
-                if(distPlayer - enemy.size - player.size < 1) {
+                if(distPlayer - enemy.size - player.baseSize < 1) {
                     createExplosion(enemy.x, enemy.y, enemy.color);
                     enemies.splice(eIndex, 1);
                     
@@ -797,16 +1605,14 @@
                     if(enemy.isBoss) damage = 50; 
                     
                     player.health -= damage;
-                    healthBar.style.width = player.health + "%";
+                    healthBar.style.width = (player.health / player.maxHealth * 100) + "%";
                     
-                    // Screen shake
                     ctx.translate(Math.random()*20 - 10, Math.random()*20 - 10);
                     setTimeout(() => ctx.setTransform(1,0,0,1,0,0), 50);
 
                     if(player.health <= 0) gameOver();
                 }
 
-                // Collision: Bullet vs Enemy
                 bullets.forEach((bullet, bIndex) => {
                     const distBullet = Math.hypot(bullet.x - enemy.x, bullet.y - enemy.y);
                     if(distBullet - enemy.size - bullet.size < 1) {
@@ -815,26 +1621,11 @@
                         if(enemy.isTank || enemy.isBoss) {
                             enemy.hp--;
                             createExplosion(bullet.x, bullet.y, '#ffffff', true); 
-                            
                             if(enemy.hp <= 0) {
-                                createExplosion(enemy.x, enemy.y, enemy.color);
-                                enemies.splice(eIndex, 1);
-                                score += enemy.points;
+                                killEnemy(eIndex, enemy);
                             }
                         } else {
-                            createExplosion(enemy.x, enemy.y, enemy.color);
-                            enemies.splice(eIndex, 1);
-                            score += enemy.points;
-                        }
-                        
-                        scoreEl.innerText = "SCORE: " + score.toString().padStart(6, '0');
-                        
-                        // Level Up Check
-                        if(score % 1500 === 0) {
-                            level++;
-                            levelEl.innerText = "SECTOR: " + level;
-                            player.health = Math.min(player.health + 10, 100); 
-                            healthBar.style.width = player.health + "%";
+                            killEnemy(eIndex, enemy);
                         }
                     }
                 });
@@ -842,7 +1633,6 @@
                 if(enemy.markedForDeletion) enemies.splice(eIndex, 1);
             });
 
-            // Particles
             particles.forEach((particle, index) => {
                 particle.update();
                 particle.draw();
@@ -853,23 +1643,50 @@
             frames++;
             requestAnimationFrame(animate);
         }
+        
+        function killEnemy(index, enemy) {
+            createExplosion(enemy.x, enemy.y, enemy.color);
+            enemies.splice(index, 1);
+            score += enemy.points;
+            runCoinsEarned += enemy.coinValue;
+            
+            scoreEl.innerText = "SCORE: " + score.toString().padStart(6, '0');
+            
+            if(score % 1500 === 0) {
+                level++;
+                levelEl.innerText = "SECTOR: " + level;
+                player.health = Math.min(player.health + 10, player.maxHealth); 
+                healthBar.style.width = (player.health / player.maxHealth * 100) + "%";
+            }
+        }
 
-        // Background animation for menu
         function menuLoop() {
             if(gameRunning) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            stars.forEach(star => { star.update(); star.draw(); });
+            bgManager.draw();
+            if(gameData.inventory.backgrounds !== 'bg_grid') {
+                stars.forEach(star => { star.update(); star.draw(); });
+            }
             requestAnimationFrame(menuLoop);
         }
-        menuLoop();     
-
+        
         // --- EVENT LISTENERS ---
 
-        // Start Game
         document.getElementById('startBtn').addEventListener('click', init);
         document.getElementById('restartBtn').addEventListener('click', init);
 
-        // Leaderboard UI
+        document.getElementById('shopBtn').addEventListener('click', () => {
+            startScreen.classList.add('hidden');
+            shopScreen.classList.remove('hidden');
+            switchTab('colors');
+            updateCoinUI();
+        });
+
+        document.getElementById('backToMenuFromShopBtn').addEventListener('click', () => {
+            shopScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        });
+
         document.getElementById('viewLeaderboardBtn').addEventListener('click', () => {
             startScreen.classList.add('hidden');
             leaderboardScreen.classList.remove('hidden');
@@ -881,12 +1698,14 @@
             startScreen.classList.remove('hidden');
         });
 
-        // High Score Saving
         document.getElementById('saveScoreBtn').addEventListener('click', () => {
             const name = playerNameInput.value.trim() || "UNKNOWN";
-            saveHighScore(name, score);
+            const newEntry = { name: name.toUpperCase(), score: score };
+            highScores.push(newEntry);
+            highScores.sort((a, b) => b.score - a.score);
+            if (highScores.length > 20) highScores = highScores.slice(0, 20);
+            localStorage.setItem(LEADERBOARD_STORAGE_KEY, JSON.stringify(highScores));
             
-            // Na opslaan, ga naar de ranglijst
             highScoreInputContainer.style.display = 'none';
             standardGameOverContent.style.display = 'block';
             gameOverScreen.classList.add('hidden');
@@ -894,12 +1713,22 @@
             updateLeaderboardUI();
         });
 
-        // Enter key om naam op te slaan
         playerNameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                document.getElementById('saveScoreBtn').click();
-            }
+            if (e.key === 'Enter') document.getElementById('saveScoreBtn').click();
         });
+
+        document.getElementById('skipToMenuBtn').addEventListener('click', () => {
+            gameOverScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        });
+
+        document.getElementById('cancelHighScoreBtn').addEventListener('click', () => {
+            gameOverScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        });
+        
+        updateCoinUI();
+        menuLoop();
 
     </script>
 </body>
